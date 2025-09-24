@@ -1,0 +1,39 @@
+{
+  "name": "react-native-heartpy",
+  "version": "0.1.0",
+  "description": "React Native bindings for a HeartPy-like C++ core (HR/HRV analysis)",
+  "main": "dist/index.js",
+  "types": "dist/index.d.ts",
+  "files": [
+    "dist",
+    "android",
+    "ios",
+    "cpp",
+    "third_party",
+    "react-native.config.js"
+  ],
+  "keywords": [
+    "react-native",
+    "heart",
+    "hrv",
+    "ppg",
+    "ecg",
+    "jsi"
+  ],
+  "license": "MIT",
+  "scripts": {
+    "build": "tsc -p tsconfig.build.json",
+    "prepare": "npm run build",
+    "test": "jest"
+  },
+  "devDependencies": {
+    "@types/jest": "^29.5.12",
+    "@types/node": "^24.3.3",
+    "jest": "^29.7.0",
+    "ts-jest": "^29.2.5",
+    "typescript": "^5.9.2"
+  },
+  "peerDependencies": {
+    "react-native": ">=0.71.0"
+  }
+}

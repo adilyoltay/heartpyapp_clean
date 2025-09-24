@@ -1,0 +1,90 @@
+# Resolve react_native_pods.rb with node to allow for hoisting
+require 'fileutils'
+require 'xcodeproj'
+require Pod::Executable.execute_command('node', ['-p',
+  'require.resolve(
+    "react-native/scripts/react_native_pods.rb",
+    {paths: [process.argv[1]]},
+  )', __dir__]).strip
+
+# Resolve react_native_pods.rb with node to allow for hoisting
+require 'fileutils'
+require 'xcodeproj'
+require Pod::Executable.execute_command('node', ['-p',
+  'require.resolve(
+    "react-native/scripts/react_native_pods.rb",
+    {paths: [process.argv[1]]},
+  )', __dir__]).strip
+
+platform :ios, '15.1'
+install! 'cocoapods', :deterministic_uuids => false
+
+target 'HeartPyApp' do
+  # Load React Native configuration
+  config = use_native_modules!
+
+  # Manual HeartPy pod
+  pod 'HeartPy', :path => '../../react-native-heartpy/ios'
+
+  # Manual VisionCamera pod for frame processor
+  pod 'VisionCamera', :path => '../node_modules/react-native-vision-camera'
+
+  # Manual Reanimated pod (required for proper initialization)
+  pod 'RNReanimated', :path => '../node_modules/react-native-reanimated'
+
+
+  use_react_native!(
+    :path => config[:reactNativePath],
+    # An absolute path to your application root.
+    :app_path => "#{Pod::Config.instance.installation_root}/..",
+    :hermes_enabled => false
+  )
+
+  target 'HeartPyAppTests' do
+    inherit! :complete
+    # Pods for testing
+  end
+
+  post_install do |installer|
+    # https://github.com/facebook/react-native/blob/main/packages/react-native/scripts/react_native_pods.rb#L197-L202
+    react_native_post_install(
+      installer,
+      config[:reactNativePath],
+      :mac_catalyst_enabled => false,
+      # :ccache_enabled => true
+    )
+
+    folly_dir = installer.sandbox.pod_dir('RCT-Folly')
+    if folly_dir
+      folly_config = File.join(folly_dir, 'folly', 'folly-config.h')
+      unless File.exist?(folly_config)
+        FileUtils.mkdir_p(File.dirname(folly_config))
+        File.write(folly_config, <<~FOLLYCFG)
+          #pragma once
+
+          #define FOLLY_MOBILE 1
+          #define FOLLY_USE_LIBCPP 1
+          #define FOLLY_HAVE_PTHREAD 1
+          #define FOLLY_CFG_NO_COROUTINES 1
+          #define FOLLY_HAVE_CLOCK_GETTIME 1
+
+          #pragma clang diagnostic ignored "-Wcomma"
+        FOLLYCFG
+      end
+    end
+
+    installer.pods_project.targets.each do |target|
+      target.build_configurations.each do |config|
+        config.build_settings['IPHONEOS_DEPLOYMENT_TARGET'] = '15.1'
+      end
+    end
+
+    installer.aggregate_targets.each do |aggregate_target|
+      aggregate_target.user_project.native_targets.each do |native_target|
+        native_target.build_configurations.each do |config|
+          config.build_settings['IPHONEOS_DEPLOYMENT_TARGET'] = '15.1'
+        end
+      end
+    end
+  end
+end

@@ -1,0 +1,84 @@
+# macOS
+.DS_Store
+*.swp
+*~.nib
+
+# Xcode
+build/
+*.pbxuser
+!default.pbxuser
+*.mode1v3
+!default.mode1v3
+*.mode2v3
+!default.mode2v3
+*.perspectivev3
+!default.perspectivev3
+xcuserdata
+*.xccheckout
+*.moved-aside
+DerivedData
+*.hmap
+*.ipa
+*.xcuserstate
+ios/.xcode.env.local
+
+# Android/IntelliJ
+build/
+.idea
+.gradle
+local.properties
+*.iml
+*.hprof
+.cxx/
+*.keystore
+!debug.keystore
+
+# Node
+node_modules/
+npm-debug.log
+yarn-error.log
+
+# React Native
+.expo/
+dist/
+*.jsbundle
+
+# fastlane
+*/fastlane/report.xml
+*/fastlane/Preview.html
+*/fastlane/screenshots
+*/fastlane/test_output
+
+# Bundle artifacts
+*.jsbundle
+
+# Ruby / CocoaPods
+/ios/Pods/
+/vendor/bundle/
+
+# Temporary files
+*.log
+.tmp
+tmp/
+
+# Build artifacts
+build/
+build-*/
+cmake-build-*/
+out/
+
+# VS Code
+.vscode/
+
+# Testing
+coverage/
+*.lcov
+
+# HeartPy specific
+HeartPyApp/android/.gradle/
+HeartPyApp/android/app/build/
+HeartPyApp/ios/build/
+HeartPyApp/ios/Pods/
+HeartPyApp/node_modules/
+react-native-heartpy/node_modules/
+react-native-heartpy/lib/
