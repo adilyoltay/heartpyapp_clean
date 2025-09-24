@@ -3,6 +3,10 @@ export const Platform = {
   select: (obj: any) => (obj && obj.android !== undefined ? obj.android : obj?.default),
 };
 
+export const TurboModuleRegistry = {
+  get: jest.fn(() => null),
+};
+
 export const NativeModules = {
   HeartPyModule: {
     analyze: jest.fn((signal: number[], fs: number, options: any) => defaultResult()),
@@ -11,6 +15,12 @@ export const NativeModules = {
     analyzeRRAsync: jest.fn((rr: number[], options: any) => Promise.resolve(defaultResult() as any)),
     analyzeSegmentwise: jest.fn((signal: number[], fs: number, options: any) => defaultResult()),
     analyzeSegmentwiseAsync: jest.fn((signal: number[], fs: number, options: any) => Promise.resolve(defaultResult() as any)),
+    analyzeTyped: jest.fn((signal: number[], fs: number, options: any) => defaultResult()),
+    analyzeAsyncTyped: jest.fn((signal: number[], fs: number, options: any) => Promise.resolve(defaultResult() as any)),
+    analyzeSegmentwiseTyped: jest.fn((signal: number[], fs: number, options: any) => defaultResult()),
+    analyzeSegmentwiseAsyncTyped: jest.fn((signal: number[], fs: number, options: any) => Promise.resolve(defaultResult() as any)),
+    analyzeRRTyped: jest.fn((rr: number[], options: any) => defaultResult()),
+    analyzeRRAsyncTyped: jest.fn((rr: number[], options: any) => Promise.resolve(defaultResult() as any)),
     interpolateClipping: jest.fn((signal: number[], fs: number, thr: number) => signal),
     hampelFilter: jest.fn((signal: number[], win: number, thr: number) => signal),
     scaleData: jest.fn((signal: number[], a: number, b: number) => signal),
@@ -19,8 +29,12 @@ export const NativeModules = {
     setConfig: jest.fn((_cfg: any) => {}),
     rtCreate: jest.fn(async (_fs: number, _opt: any) => 123),
     rtPush: jest.fn(async (_h: number, _arr: number[], _t0?: number) => {}),
+    rtPushTs: jest.fn(async (_h: number, _arr: number[], _ts: number[]) => {}),
     rtPoll: jest.fn(async (_h: number) => null),
+    rtSetWindow: jest.fn(async (_h: number, _windowSeconds: number) => {}),
     rtDestroy: jest.fn(async (_h: number) => {}),
+    addListener: jest.fn((_event: string) => {}),
+    removeListeners: jest.fn((_count: number) => {}),
   },
 };
 
@@ -55,4 +69,4 @@ function defaultResult() {
   } as const;
 }
 
-export default { NativeModules, Platform };
+export default { NativeModules, Platform, TurboModuleRegistry };

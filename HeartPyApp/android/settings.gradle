@@ -1,4 +1,5 @@
 pluginManagement {
+    includeBuild("../node_modules/@react-native/gradle-plugin")
     repositories {
         gradlePluginPortal()
         google()
@@ -15,6 +16,4 @@ extensions.configure(com.facebook.react.ReactSettingsExtension) { ex ->
 }
 
 rootProject.name = 'HeartPyApp'
-
-include(':app')
-includeBuild('../node_modules/@react-native/gradle-plugin')
+include ':app'

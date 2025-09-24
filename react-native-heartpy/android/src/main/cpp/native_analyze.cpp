@@ -1318,6 +1318,51 @@ static void installBinding(facebook::jsi::Runtime& rt) {
     );
     rt.global().setProperty(rt, "__hpRtPush", fnPush);
 
+    // __hpRtPushTs(handle:number, samples:Float32Array, timestamps:Float64Array) -> void
+    auto fnPushTs = Function::createFromHostFunction(
+        rt,
+        PropNameID::forAscii(rt, "__hpRtPushTs"),
+        3,
+        [](Runtime& rt, const Value&, const Value* args, size_t count) -> Value {
+            if (count < 3) throw JSError(rt, "HEARTPY_E102: missing buffers");
+            if (!args[0].isNumber()) throw JSError(rt, "HEARTPY_E101: invalid handle");
+            uint32_t id = (uint32_t)args[0].asNumber();
+            void* p = hp_handle_get(id);
+            if (!p) throw JSError(rt, "HEARTPY_E101: invalid handle");
+
+            auto samplesVal = args[1];
+            auto timestampsVal = args[2];
+            if (!samplesVal.isObject() || !timestampsVal.isObject()) {
+                throw JSError(rt, "HEARTPY_E102: invalid buffers");
+            }
+
+            auto samplesObj = samplesVal.asObject(rt);
+            auto timestampsObj = timestampsVal.asObject(rt);
+            size_t len = (size_t)samplesObj.getProperty(rt, "length").asNumber();
+            size_t lenTs = (size_t)timestampsObj.getProperty(rt, "length").asNumber();
+            if (len == 0 || lenTs == 0) throw JSError(rt, "HEARTPY_E102: empty buffer");
+            size_t countEffective = std::min(len, lenTs);
+            const size_t MAX_SAMPLES_PER_PUSH = 5000;
+            if (countEffective > MAX_SAMPLES_PER_PUSH) throw JSError(rt, "HEARTPY_E102: buffer too large");
+
+            std::vector<float> samples;
+            samples.reserve(countEffective);
+            for (size_t i = 0; i < countEffective; ++i) {
+                samples.push_back((float)samplesObj.getPropertyAtIndex(rt, (uint32_t)i).asNumber());
+            }
+
+            std::vector<double> timestamps;
+            timestamps.reserve(countEffective);
+            for (size_t i = 0; i < countEffective; ++i) {
+                timestamps.push_back(timestampsObj.getPropertyAtIndex(rt, (uint32_t)i).asNumber());
+            }
+
+            hp_rt_push_ts(p, samples.data(), timestamps.data(), countEffective);
+            return Value::undefined();
+        }
+    );
+    rt.global().setProperty(rt, "__hpRtPushTs", fnPushTs);
+
     // __hpRtPoll(handle:number) -> object | null
     auto fnPoll = Function::createFromHostFunction(
         rt,

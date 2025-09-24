@@ -94,6 +94,10 @@ npx react-native run-android
 - Sadece çalışması için gerekli minimum dosyalar tutuldu
 - node_modules ve build klasörleri .gitignore'da
 
+## 📚 Dokümantasyon
+
+- [New Architecture Readiness](docs/new-arch-readiness.md)
+
 ## ⚠️ Önemli
 
 - **C++ kodlarına dokunmayın** (repo kuralı)

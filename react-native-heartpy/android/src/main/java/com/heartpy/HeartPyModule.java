@@ -2,20 +2,23 @@ package com.heartpy;
 
 import androidx.annotation.NonNull;
 
-import com.facebook.react.bridge.ReactApplicationContext;
-import com.facebook.react.bridge.ReactContextBaseJavaModule;
-import com.facebook.react.bridge.ReactMethod;
-import com.facebook.react.bridge.UiThreadUtil;
-import com.facebook.react.bridge.Promise;
-import com.facebook.react.bridge.WritableArray;
 import com.facebook.react.bridge.Arguments;
-import com.facebook.jni.HybridData;
+import com.facebook.react.bridge.Promise;
+import com.facebook.react.bridge.ReactApplicationContext;
 import com.facebook.react.bridge.ReactContext;
+import com.facebook.react.bridge.ReactMethod;
+import com.facebook.react.bridge.ReadableArray;
+import com.facebook.react.bridge.ReadableMap;
+import com.facebook.react.bridge.WritableArray;
 import android.util.Log;
 import java.util.concurrent.atomic.AtomicInteger;
 import java.util.concurrent.ConcurrentLinkedQueue;
 
-public class HeartPyModule extends ReactContextBaseJavaModule {
+import com.facebook.fbreact.specs.NativeHeartPySpec;
+import javax.annotation.Nullable;
+
+public class HeartPyModule extends NativeHeartPySpec {
+    public static final String NAME = NativeHeartPySpec.NAME;
     static {
         System.loadLibrary("heartpy_rn");
     }
@@ -255,11 +258,166 @@ public class HeartPyModule extends ReactContextBaseJavaModule {
     private static volatile boolean CFG_DEBUG = false;
     private static final int MAX_SAMPLES_PER_PUSH = 5000;
 
+    private static double[] readableArrayToDoubleArray(ReadableArray array) {
+        if (array == null) {
+            return new double[0];
+        }
+        final int size = array.size();
+        double[] out = new double[size];
+        for (int i = 0; i < size; i++) {
+            out[i] = array.getDouble(i);
+        }
+        return out;
+    }
+
+    @Override
+    @ReactMethod(isBlockingSynchronousMethod = true)
+    public com.facebook.react.bridge.WritableMap analyze(ReadableArray signal, double fs, @Nullable ReadableMap options) {
+        return analyzeInternal(readableArrayToDoubleArray(signal), fs, options);
+    }
+
+    @Override
+    @ReactMethod(isBlockingSynchronousMethod = true)
+    public com.facebook.react.bridge.WritableMap analyzeSegmentwise(ReadableArray signal, double fs, @Nullable ReadableMap options) {
+        return analyzeSegmentwiseInternal(readableArrayToDoubleArray(signal), fs, options);
+    }
+
+    @Override
+    @ReactMethod(isBlockingSynchronousMethod = true)
+    public com.facebook.react.bridge.WritableMap analyzeRR(ReadableArray rrIntervals, @Nullable ReadableMap options) {
+        return analyzeRRInternal(readableArrayToDoubleArray(rrIntervals), options);
+    }
+
+    @Override
+    @ReactMethod
+    public void analyzeAsync(ReadableArray signal, double fs, @Nullable ReadableMap options, Promise promise) {
+        analyzeAsyncInternal(readableArrayToDoubleArray(signal), fs, options, promise);
+    }
+
+    @Override
+    @ReactMethod
+    public void analyzeSegmentwiseAsync(ReadableArray signal, double fs, @Nullable ReadableMap options, Promise promise) {
+        analyzeSegmentwiseAsyncInternal(readableArrayToDoubleArray(signal), fs, options, promise);
+    }
+
+    @Override
+    @ReactMethod
+    public void analyzeRRAsync(ReadableArray rrIntervals, @Nullable ReadableMap options, Promise promise) {
+        analyzeRRAsyncInternal(readableArrayToDoubleArray(rrIntervals), options, promise);
+    }
+
+    @Override
+    @ReactMethod(isBlockingSynchronousMethod = true)
+    public com.facebook.react.bridge.WritableMap analyzeTyped(ReadableArray signal, double fs, @Nullable ReadableMap options) {
+        return analyzeTypedInternal(readableArrayToDoubleArray(signal), fs, options);
+    }
+
+    @Override
+    @ReactMethod(isBlockingSynchronousMethod = true)
+    public com.facebook.react.bridge.WritableMap analyzeSegmentwiseTyped(ReadableArray signal, double fs, @Nullable ReadableMap options) {
+        return analyzeSegmentwiseTypedInternal(readableArrayToDoubleArray(signal), fs, options);
+    }
+
+    @Override
+    @ReactMethod(isBlockingSynchronousMethod = true)
+    public com.facebook.react.bridge.WritableMap analyzeRRTyped(ReadableArray rrIntervals, @Nullable ReadableMap options) {
+        return analyzeRRTypedInternal(readableArrayToDoubleArray(rrIntervals), options);
+    }
+
+    @Override
+    @ReactMethod
+    public void analyzeAsyncTyped(ReadableArray signal, double fs, @Nullable ReadableMap options, Promise promise) {
+        analyzeAsyncTypedInternal(readableArrayToDoubleArray(signal), fs, options, promise);
+    }
+
+    @Override
+    @ReactMethod
+    public void analyzeSegmentwiseAsyncTyped(ReadableArray signal, double fs, @Nullable ReadableMap options, Promise promise) {
+        analyzeSegmentwiseAsyncTypedInternal(readableArrayToDoubleArray(signal), fs, options, promise);
+    }
+
+    @Override
+    @ReactMethod
+    public void analyzeRRAsyncTyped(ReadableArray rrIntervals, @Nullable ReadableMap options, Promise promise) {
+        analyzeRRAsyncTypedInternal(readableArrayToDoubleArray(rrIntervals), options, promise);
+    }
+
+    @Override
+    @ReactMethod(isBlockingSynchronousMethod = true)
+    public WritableArray interpolateClipping(ReadableArray signal, double fs, @Nullable Double threshold) {
+        return interpolateClippingInternal(readableArrayToDoubleArray(signal), fs, threshold != null ? threshold : 1020.0);
+    }
+
+    @Override
+    @ReactMethod(isBlockingSynchronousMethod = true)
+    public WritableArray hampelFilter(ReadableArray signal, @Nullable Double windowSize, @Nullable Double threshold) {
+        int win = windowSize != null ? (int) Math.round(windowSize) : 6;
+        double thr = threshold != null ? threshold : 3.0;
+        return hampelFilterInternal(readableArrayToDoubleArray(signal), win, thr);
+    }
+
+    @Override
+    @ReactMethod(isBlockingSynchronousMethod = true)
+    public WritableArray scaleData(ReadableArray signal, @Nullable Double newMin, @Nullable Double newMax) {
+        double min = newMin != null ? newMin : 0.0;
+        double max = newMax != null ? newMax : 1024.0;
+        return scaleDataInternal(readableArrayToDoubleArray(signal), min, max);
+    }
+
+    @Override
+    @ReactMethod
+    public void rtCreate(double fs, @Nullable ReadableMap options, Promise promise) {
+        rtCreateInternal(fs, options, promise);
+    }
+
+    @Override
+    @ReactMethod
+    public void rtPush(double handle, ReadableArray samples, @Nullable Double t0, Promise promise) {
+        rtPushInternal(handle, readableArrayToDoubleArray(samples), t0, promise);
+    }
+
+    @Override
+    @ReactMethod
+    public void rtPushTs(double handle, ReadableArray samples, ReadableArray timestamps, Promise promise) {
+        rtPushTsInternal(handle, readableArrayToDoubleArray(samples), readableArrayToDoubleArray(timestamps), promise);
+    }
+
+    @Override
+    @ReactMethod
+    public void rtPoll(double handle, Promise promise) {
+        rtPollInternal(handle, promise);
+    }
+
+    @Override
+    @ReactMethod
+    public void rtSetWindow(double handle, double windowSeconds, Promise promise) {
+        rtSetWindowInternal(handle, windowSeconds, promise);
+    }
+
+    @Override
+    @ReactMethod
+    public void rtDestroy(double handle, Promise promise) {
+        rtDestroyInternal(handle, promise);
+    }
+
+    @Override
+    @ReactMethod
+    public void addListener(String eventType) {
+        super.addListener(eventType);
+    }
+
+    @Override
+    @ReactMethod
+    public void removeListeners(double count) {
+        super.removeListeners(count);
+    }
+
     private static final AtomicInteger NM_PUSH_SUBMIT = new AtomicInteger(0);
     private static final AtomicInteger NM_PUSH_DONE = new AtomicInteger(0);
     private static final AtomicInteger NM_POLL_SUBMIT = new AtomicInteger(0);
     private static final AtomicInteger NM_POLL_DONE = new AtomicInteger(0);
 
+    @Override
     @ReactMethod(isBlockingSynchronousMethod = true)
     public com.facebook.react.bridge.WritableMap getConfig() {
         com.facebook.react.bridge.WritableMap map = com.facebook.react.bridge.Arguments.createMap();
@@ -270,8 +428,9 @@ public class HeartPyModule extends ReactContextBaseJavaModule {
         return map;
     }
 
+    @Override
     @ReactMethod
-    public void setConfig(com.facebook.react.bridge.ReadableMap cfg) {
+    public void setConfig(@Nullable com.facebook.react.bridge.ReadableMap cfg) {
         if (cfg == null) return;
         try {
             if (cfg.hasKey("jsiEnabled")) CFG_JSI_ENABLED = cfg.getBoolean("jsiEnabled");
@@ -291,6 +450,7 @@ public class HeartPyModule extends ReactContextBaseJavaModule {
     }
 
     @NonNull
+    @Override
     @Override
     public String getName() {
         return "HeartPyModule";
@@ -395,6 +555,7 @@ public class HeartPyModule extends ReactContextBaseJavaModule {
     }
 
     // Install Android JSI bindings (blocking, sync)
+    @Override
     @ReactMethod(isBlockingSynchronousMethod = true)
     public boolean installJSI() {
         try {
@@ -758,8 +919,7 @@ public class HeartPyModule extends ReactContextBaseJavaModule {
         return o;
     }
 
-    @ReactMethod(isBlockingSynchronousMethod = true)
-    public com.facebook.react.bridge.WritableMap analyzeTyped(double[] signal, double fs,
+    private com.facebook.react.bridge.WritableMap analyzeTypedInternal(double[] signal, double fs,
                                                               com.facebook.react.bridge.ReadableMap options) {
         Opts o = parseOptions(options);
         HeartMetricsTyped metrics = analyzeNativeTyped(signal, fs,
@@ -786,8 +946,7 @@ public class HeartPyModule extends ReactContextBaseJavaModule {
         return typedToWritableMap(metrics);
     }
 
-    @ReactMethod
-    public void analyzeAsyncTyped(double[] signal, double fs,
+    private void analyzeAsyncTypedInternal(double[] signal, double fs,
                                   com.facebook.react.bridge.ReadableMap options,
                                   com.facebook.react.bridge.Promise promise) {
         new Thread(() -> {
@@ -821,9 +980,8 @@ public class HeartPyModule extends ReactContextBaseJavaModule {
         }).start();
     }
 
-    @ReactMethod(isBlockingSynchronousMethod = true)
-    public com.facebook.react.bridge.WritableMap analyzeSegmentwiseTyped(double[] signal, double fs,
-                                                                         com.facebook.react.bridge.ReadableMap options) {
+    private com.facebook.react.bridge.WritableMap analyzeSegmentwiseTypedInternal(double[] signal, double fs,
+                                                                        com.facebook.react.bridge.ReadableMap options) {
         Opts o = parseOptions(options);
         HeartMetricsTyped metrics = analyzeSegmentwiseNativeTyped(signal, fs,
                 o.lowHz, o.highHz, o.order,
@@ -849,8 +1007,7 @@ public class HeartPyModule extends ReactContextBaseJavaModule {
         return typedToWritableMap(metrics);
     }
 
-    @ReactMethod
-    public void analyzeSegmentwiseAsyncTyped(double[] signal, double fs,
+    private void analyzeSegmentwiseAsyncTypedInternal(double[] signal, double fs,
                                              com.facebook.react.bridge.ReadableMap options,
                                              com.facebook.react.bridge.Promise promise) {
         new Thread(() -> {
@@ -884,16 +1041,14 @@ public class HeartPyModule extends ReactContextBaseJavaModule {
         }).start();
     }
 
-    @ReactMethod(isBlockingSynchronousMethod = true)
-    public com.facebook.react.bridge.WritableMap analyzeRRTyped(double[] rr,
-                                                                com.facebook.react.bridge.ReadableMap options) {
+    private com.facebook.react.bridge.WritableMap analyzeRRTypedInternal(double[] rr,
+                                                               com.facebook.react.bridge.ReadableMap options) {
         Opts o = parseOptions(options);
         HeartMetricsTyped metrics = analyzeRRNativeTyped(rr, o.cleanRR, o.cleanMethod, o.breathingAsBpm, o.thresholdRR, o.sdsdMode, o.poincareMode, o.pnnAsPercent);
         return typedToWritableMap(metrics);
     }
 
-    @ReactMethod
-    public void analyzeRRAsyncTyped(double[] rr,
+    private void analyzeRRAsyncTypedInternal(double[] rr,
                                     com.facebook.react.bridge.ReadableMap options,
                                     com.facebook.react.bridge.Promise promise) {
         new Thread(() -> {
@@ -907,8 +1062,7 @@ public class HeartPyModule extends ReactContextBaseJavaModule {
         }).start();
     }
 
-    @ReactMethod(isBlockingSynchronousMethod = true)
-    public com.facebook.react.bridge.WritableMap analyze(double[] signal, double fs,
+    private com.facebook.react.bridge.WritableMap analyzeInternal(double[] signal, double fs,
                                                          com.facebook.react.bridge.ReadableMap options) {
         Opts o = parseOptions(options);
         String json = analyzeNativeJson(signal, fs,
@@ -935,8 +1089,7 @@ public class HeartPyModule extends ReactContextBaseJavaModule {
         return jsonToWritableMap(json);
     }
 
-    @ReactMethod
-    public void analyzeAsync(double[] signal, double fs,
+    private void analyzeAsyncInternal(double[] signal, double fs,
                              com.facebook.react.bridge.ReadableMap options,
                              com.facebook.react.bridge.Promise promise) {
         new Thread(() -> {
@@ -970,16 +1123,14 @@ public class HeartPyModule extends ReactContextBaseJavaModule {
         }).start();
     }
 
-    @ReactMethod(isBlockingSynchronousMethod = true)
-    public com.facebook.react.bridge.WritableMap analyzeRR(double[] rr,
-                                                           com.facebook.react.bridge.ReadableMap options) {
+    private com.facebook.react.bridge.WritableMap analyzeRRInternal(double[] rr,
+                                                          com.facebook.react.bridge.ReadableMap options) {
         Opts o = parseOptions(options);
         String json = analyzeRRNativeJson(rr, o.cleanRR, o.cleanMethod, o.breathingAsBpm, o.thresholdRR, o.sdsdMode, o.poincareMode, o.pnnAsPercent);
         return jsonToWritableMap(json);
     }
 
-    @ReactMethod
-    public void analyzeRRAsync(double[] rr,
+    private void analyzeRRAsyncInternal(double[] rr,
                                com.facebook.react.bridge.ReadableMap options,
                                com.facebook.react.bridge.Promise promise) {
         new Thread(() -> {
@@ -993,8 +1144,7 @@ public class HeartPyModule extends ReactContextBaseJavaModule {
         }).start();
     }
 
-    @ReactMethod(isBlockingSynchronousMethod = true)
-    public com.facebook.react.bridge.WritableMap analyzeSegmentwise(double[] signal, double fs,
+    private com.facebook.react.bridge.WritableMap analyzeSegmentwiseInternal(double[] signal, double fs,
                                                                     com.facebook.react.bridge.ReadableMap options) {
         Opts o = parseOptions(options);
         String json = analyzeSegmentwiseNativeJson(signal, fs,
@@ -1022,8 +1172,7 @@ public class HeartPyModule extends ReactContextBaseJavaModule {
         return jsonToWritableMap(json);
     }
 
-    @ReactMethod
-    public void analyzeSegmentwiseAsync(double[] signal, double fs,
+    private void analyzeSegmentwiseAsyncInternal(double[] signal, double fs,
                                         com.facebook.react.bridge.ReadableMap options,
                                         com.facebook.react.bridge.Promise promise) {
         new Thread(() -> {
@@ -1059,7 +1208,7 @@ public class HeartPyModule extends ReactContextBaseJavaModule {
     }
 
     @ReactMethod(isBlockingSynchronousMethod = true)
-    public com.facebook.react.bridge.WritableArray interpolateClipping(double[] signal, double fs, double threshold) {
+    private com.facebook.react.bridge.WritableArray interpolateClippingInternal(double[] signal, double fs, double threshold) {
         double[] y = interpolateClippingNative(signal, fs, threshold);
         com.facebook.react.bridge.WritableArray arr = com.facebook.react.bridge.Arguments.createArray();
         for (double v : y) arr.pushDouble(v);
@@ -1067,7 +1216,7 @@ public class HeartPyModule extends ReactContextBaseJavaModule {
     }
 
     @ReactMethod(isBlockingSynchronousMethod = true)
-    public com.facebook.react.bridge.WritableArray hampelFilter(double[] signal, int windowSize, double threshold) {
+    private com.facebook.react.bridge.WritableArray hampelFilterInternal(double[] signal, int windowSize, double threshold) {
         double[] y = hampelFilterNative(signal, windowSize, threshold);
         com.facebook.react.bridge.WritableArray arr = com.facebook.react.bridge.Arguments.createArray();
         for (double v : y) arr.pushDouble(v);
@@ -1075,7 +1224,7 @@ public class HeartPyModule extends ReactContextBaseJavaModule {
     }
 
     @ReactMethod(isBlockingSynchronousMethod = true)
-    public com.facebook.react.bridge.WritableArray scaleData(double[] signal, double newMin, double newMax) {
+    private com.facebook.react.bridge.WritableArray scaleDataInternal(double[] signal, double newMin, double newMax) {
         double[] y = scaleDataNative(signal, newMin, newMax);
         com.facebook.react.bridge.WritableArray arr = com.facebook.react.bridge.Arguments.createArray();
         for (double v : y) arr.pushDouble(v);
@@ -1086,8 +1235,7 @@ public class HeartPyModule extends ReactContextBaseJavaModule {
     // Realtime Streaming (NativeModules P0)
     // ------------------------------
 
-    @ReactMethod
-    public void rtCreate(double fs, com.facebook.react.bridge.ReadableMap options, Promise promise) {
+    private void rtCreateInternal(double fs, com.facebook.react.bridge.ReadableMap options, Promise promise) {
         try {
             Opts o = parseOptions(options);
             if (fs < 1.0 || fs > 10000.0) { promise.reject("HEARTPY_E001", "Invalid sample rate: " + fs + ". Must be 1-10000 Hz."); return; }
@@ -1133,8 +1281,7 @@ public class HeartPyModule extends ReactContextBaseJavaModule {
         }
     }
 
-    @ReactMethod
-    public void rtSetWindow(double handle, double windowSeconds, Promise promise) {
+    private void rtSetWindowInternal(double handle, double windowSeconds, Promise promise) {
         try {
             final long h = (long) handle;
             if (h == 0L) { promise.reject("rt_set_window_invalid_args", "Invalid or destroyed handle"); return; }
@@ -1146,8 +1293,7 @@ public class HeartPyModule extends ReactContextBaseJavaModule {
         }
     }
 
-    @ReactMethod
-    public void rtPush(double handle, double[] samples, Double t0, Promise promise) {
+    private void rtPushInternal(double handle, double[] samples, Double t0, Promise promise) {
         try {
             final long h = (long) handle;
             if (h == 0L) { promise.reject("HEARTPY_E101", "Invalid or destroyed handle"); return; }
@@ -1165,8 +1311,7 @@ public class HeartPyModule extends ReactContextBaseJavaModule {
         }
     }
 
-    @ReactMethod
-    public void rtPoll(double handle, Promise promise) {
+    private void rtPollInternal(double handle, Promise promise) {
         try {
             final long h = (long) handle;
             if (h == 0L) { promise.reject("HEARTPY_E111", "Invalid or destroyed handle"); return; }
@@ -1207,8 +1352,7 @@ public class HeartPyModule extends ReactContextBaseJavaModule {
         }
     }
 
-    @ReactMethod
-    public void rtDestroy(double handle, Promise promise) {
+    private void rtDestroyInternal(double handle, Promise promise) {
         try {
             final long h = (long) handle;
             if (h == 0L) { promise.resolve(null); return; }
@@ -1220,8 +1364,7 @@ public class HeartPyModule extends ReactContextBaseJavaModule {
         }
     }
 
-    @ReactMethod
-    public void rtPushTs(double handle, double[] samples, double[] timestamps, Promise promise) {
+    private void rtPushTsInternal(double handle, double[] samples, double[] timestamps, Promise promise) {
         try {
             final long h = (long) handle;
             if (h == 0L) { promise.reject("HEARTPY_E101", "Invalid or destroyed handle"); return; }

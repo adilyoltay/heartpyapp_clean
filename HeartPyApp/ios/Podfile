@@ -7,15 +7,6 @@ require Pod::Executable.execute_command('node', ['-p',
     {paths: [process.argv[1]]},
   )', __dir__]).strip
 
-# Resolve react_native_pods.rb with node to allow for hoisting
-require 'fileutils'
-require 'xcodeproj'
-require Pod::Executable.execute_command('node', ['-p',
-  'require.resolve(
-    "react-native/scripts/react_native_pods.rb",
-    {paths: [process.argv[1]]},
-  )', __dir__]).strip
-
 platform :ios, '15.1'
 install! 'cocoapods', :deterministic_uuids => false
 
@@ -23,13 +14,12 @@ target 'HeartPyApp' do
   # Load React Native configuration
   config = use_native_modules!
 
-  # Manual HeartPy pod
+  # Keep manual pod declarations until upstreams ship stable new-arch specs.
+  # VisionCamera and Reanimated both still require explicit pod entries to:
+  # - ensure frame processor + layout animations load before TurboModules land
+  # - avoid CocoaPods plugins from toggling new-arch flags prematurely
   pod 'HeartPy', :path => '../../react-native-heartpy/ios'
-
-  # Manual VisionCamera pod for frame processor
   pod 'VisionCamera', :path => '../node_modules/react-native-vision-camera'
-
-  # Manual Reanimated pod (required for proper initialization)
   pod 'RNReanimated', :path => '../node_modules/react-native-reanimated'
 
 
@@ -37,7 +27,9 @@ target 'HeartPyApp' do
     :path => config[:reactNativePath],
     # An absolute path to your application root.
     :app_path => "#{Pod::Config.instance.installation_root}/..",
-    :hermes_enabled => false
+    :hermes_enabled => true,
+    :new_arch_enabled => false,        # temporarily disable new arch for compatibility
+    :fabric_enabled => false           # keep Fabric off 
   )
 
   target 'HeartPyAppTests' do

@@ -26,12 +26,19 @@ static NSMutableArray<NSNumber*>* globalPPGBuffer = nil;
 static NSMutableArray<NSNumber*>* globalPPGTsBuffer = nil;
 static dispatch_queue_t ppgBufferQueue = nil;
 static double lastPPGConfidence = 0.0;
+static NSMutableDictionary<NSString*, id>* gRuntimeConfig = nil;
 
 + (void)initialize {
     if (self == [HeartPyModule class]) {
         globalPPGBuffer = [[NSMutableArray alloc] init];
         globalPPGTsBuffer = [[NSMutableArray alloc] init];
         ppgBufferQueue = dispatch_queue_create("heartpy.ppg.buffer", DISPATCH_QUEUE_SERIAL);
+        gRuntimeConfig = [@{
+            @"jsiEnabled": @YES,
+            @"zeroCopyEnabled": @YES,
+            @"debug": @NO,
+            @"maxSamplesPerPush": @(5000)
+        } mutableCopy];
         // Subscribe to native PPG notifications from VisionCamera frame processor
         [[NSNotificationCenter defaultCenter] addObserverForName:@"HeartPyPPGSample"
                                                           object:nil
@@ -413,6 +420,44 @@ RCT_EXPORT_MODULE();
 
 - (BOOL)requiresMainQueueSetup { return YES; }
 
+#if RCT_NEW_ARCH_ENABLED
+- (NSDictionary *)getConfig
+#else
+RCT_EXPORT_BLOCKING_SYNCHRONOUS_METHOD(getConfig)
+#endif
+{
+    @synchronized (gRuntimeConfig) {
+        return [gRuntimeConfig copy] ?: @{};
+    }
+}
+
+#if RCT_NEW_ARCH_ENABLED
+- (void)setConfig:(NSDictionary *)config
+#else
+RCT_EXPORT_METHOD(setConfig:(NSDictionary *)config)
+#endif
+{
+    if (![config isKindOfClass:[NSDictionary class]]) {
+        return;
+    }
+    @synchronized (gRuntimeConfig) {
+        [config enumerateKeysAndObjectsUsingBlock:^(id key, id obj, BOOL *stop) {
+            if (!key) { return; }
+            gRuntimeConfig[key] = obj;
+        }];
+    }
+}
+
+- (void)addListener:(NSString *)eventType
+{
+    [super addListener:eventType];
+}
+
+- (void)removeListeners:(double)count
+{
+    [super removeListeners:count];
+}
+
 static heartpy::Options optionsFromNSDictionary(NSDictionary* optDict) {
     heartpy::Options opt;
     if (!optDict) return opt;
@@ -514,15 +559,21 @@ static heartpy::Options optionsFromNSDictionary(NSDictionary* optDict) {
     return opt;
 }
 
+#if RCT_NEW_ARCH_ENABLED
+- (NSDictionary *)analyze:(NSArray *)signal
+                       fs:(double)fs
+                  options:(NSDictionary *)options
+#else
 // Synchronous bridge method to align with Android/TypeScript usage
 RCT_EXPORT_BLOCKING_SYNCHRONOUS_METHOD(analyze:(NSArray<NSNumber*>*)signal
-                                    fs:(nonnull NSNumber*)fs
+                                    fs:(double)fs
                                     options:(NSDictionary*)options)
+#endif
 {
     std::vector<double> x; x.reserve(signal.count);
     for (NSNumber* n in signal) x.push_back([n doubleValue]);
     heartpy::Options opt = optionsFromNSDictionary(options);
-    auto res = heartpy::analyzeSignal(x, [fs doubleValue], opt);
+    auto res = heartpy::analyzeSignal(x, fs, opt);
 
     NSMutableDictionary* out = [NSMutableDictionary new];
     out[@"bpm"] = @(res.bpm);
@@ -617,59 +668,32 @@ RCT_EXPORT_BLOCKING_SYNCHRONOUS_METHOD(analyze:(NSArray<NSNumber*>*)signal
     return out;
 }
 
+#if RCT_NEW_ARCH_ENABLED
+- (NSDictionary *)analyzeTyped:(NSArray *)signal
+                              fs:(double)fs
+                         options:(NSDictionary *)options
+#else
 RCT_EXPORT_BLOCKING_SYNCHRONOUS_METHOD(analyzeTyped:(NSArray<NSNumber*>*)signal
-                                     fs:(nonnull NSNumber*)fs
+                                     fs:(double)fs
                                      options:(NSDictionary*)options)
+#endif
 {
     return [self analyze:signal fs:fs options:options];
 }
 
+#if RCT_NEW_ARCH_ENABLED
+- (void)analyzeAsyncTyped:(NSArray *)signal
+                        fs:(double)fs
+                   options:(NSDictionary *)options
+                   resolve:(RCTPromiseResolveBlock)resolve
+                    reject:(RCTPromiseRejectBlock)reject
+#else
 RCT_EXPORT_METHOD(analyzeAsyncTyped:(NSArray<NSNumber*>*)signal
-                  fs:(nonnull NSNumber*)fs
+                  fs:(double)fs
                   options:(NSDictionary*)options
                   resolver:(RCTPromiseResolveBlock)resolve
                   rejecter:(RCTPromiseRejectBlock)reject)
-{
-    [self analyzeAsync:signal fs:fs options:options resolver:resolve rejecter:reject];
-}
-
-// Typed segmentwise/rr wrappers (NSDictionary already typed)
-RCT_EXPORT_BLOCKING_SYNCHRONOUS_METHOD(analyzeSegmentwiseTyped:(NSArray<NSNumber*>*)signal
-                                     fs:(nonnull NSNumber*)fs
-                                     options:(NSDictionary*)options)
-{
-    return [self analyzeSegmentwise:signal fs:fs options:options];
-}
-
-RCT_EXPORT_METHOD(analyzeSegmentwiseAsyncTyped:(NSArray<NSNumber*>*)signal
-                  fs:(nonnull NSNumber*)fs
-                  options:(NSDictionary*)options
-                  resolver:(RCTPromiseResolveBlock)resolve
-                  rejecter:(RCTPromiseRejectBlock)reject)
-{
-    [self analyzeSegmentwiseAsync:signal fs:fs options:options resolver:resolve rejecter:reject];
-}
-
-RCT_EXPORT_BLOCKING_SYNCHRONOUS_METHOD(analyzeRRTyped:(NSArray<NSNumber*>*)rr
-                                    options:(NSDictionary*)options)
-{
-    return [self analyzeRR:rr options:options];
-}
-
-RCT_EXPORT_METHOD(analyzeRRAsyncTyped:(NSArray<NSNumber*>*)rr
-                  options:(NSDictionary*)options
-                  resolver:(RCTPromiseResolveBlock)resolve
-                  rejecter:(RCTPromiseRejectBlock)reject)
-{
-    [self analyzeRRAsync:rr options:options resolver:resolve rejecter:reject];
-}
-
-// Async Promise-based variants to avoid blocking the JS thread
-RCT_EXPORT_METHOD(analyzeAsync:(NSArray<NSNumber*>*)signal
-                  fs:(nonnull NSNumber*)fs
-                  options:(NSDictionary*)options
-                  resolver:(RCTPromiseResolveBlock)resolve
-                  rejecter:(RCTPromiseRejectBlock)reject)
+#endif
 {
     dispatch_async(dispatch_get_global_queue(QOS_CLASS_USER_INITIATED, 0), ^{
         @try {
@@ -681,8 +705,109 @@ RCT_EXPORT_METHOD(analyzeAsync:(NSArray<NSNumber*>*)signal
     });
 }
 
+// Typed segmentwise/rr wrappers (NSDictionary already typed)
+#if RCT_NEW_ARCH_ENABLED
+- (NSDictionary *)analyzeSegmentwiseTyped:(NSArray *)signal
+                                         fs:(double)fs
+                                    options:(NSDictionary *)options
+#else
+RCT_EXPORT_BLOCKING_SYNCHRONOUS_METHOD(analyzeSegmentwiseTyped:(NSArray<NSNumber*>*)signal
+                                     fs:(double)fs
+                                     options:(NSDictionary*)options)
+#endif
+{
+    return [self analyzeSegmentwise:signal fs:fs options:options];
+}
+
+#if RCT_NEW_ARCH_ENABLED
+- (void)analyzeSegmentwiseAsyncTyped:(NSArray *)signal
+                                   fs:(double)fs
+                              options:(NSDictionary *)options
+                              resolve:(RCTPromiseResolveBlock)resolve
+                               reject:(RCTPromiseRejectBlock)reject
+#else
+RCT_EXPORT_METHOD(analyzeSegmentwiseAsyncTyped:(NSArray<NSNumber*>*)signal
+                  fs:(double)fs
+                  options:(NSDictionary*)options
+                  resolver:(RCTPromiseResolveBlock)resolve
+                  rejecter:(RCTPromiseRejectBlock)reject)
+#endif
+{
+    dispatch_async(dispatch_get_global_queue(QOS_CLASS_USER_INITIATED, 0), ^{
+        @try {
+            id res = [self analyzeSegmentwise:signal fs:fs options:options];
+            resolve(res);
+        } @catch (NSException* e) {
+            reject(@"analyze_segmentwise_error", e.reason, nil);
+        }
+    });
+}
+
+#if RCT_NEW_ARCH_ENABLED
+- (NSDictionary *)analyzeRRTyped:(NSArray *)rr
+                          options:(NSDictionary *)options
+#else
+RCT_EXPORT_BLOCKING_SYNCHRONOUS_METHOD(analyzeRRTyped:(NSArray<NSNumber*>*)rr
+                                    options:(NSDictionary*)options)
+#endif
+{
+    return [self analyzeRR:rr options:options];
+}
+
+#if RCT_NEW_ARCH_ENABLED
+- (void)analyzeRRAsyncTyped:(NSArray *)rr
+                     options:(NSDictionary *)options
+                     resolve:(RCTPromiseResolveBlock)resolve
+                      reject:(RCTPromiseRejectBlock)reject
+#else
+RCT_EXPORT_METHOD(analyzeRRAsyncTyped:(NSArray<NSNumber*>*)rr
+                  options:(NSDictionary*)options
+                  resolver:(RCTPromiseResolveBlock)resolve
+                  rejecter:(RCTPromiseRejectBlock)reject)
+#endif
+{
+    dispatch_async(dispatch_get_global_queue(QOS_CLASS_USER_INITIATED, 0), ^{
+        @try {
+            id res = [self analyzeRR:rr options:options];
+            resolve(res);
+        } @catch (NSException* e) {
+            reject(@"analyze_rr_error", e.reason, nil);
+        }
+    });
+}
+
+// Async Promise-based variants to avoid blocking the JS thread
+#if RCT_NEW_ARCH_ENABLED
+- (void)analyzeAsync:(NSArray *)signal
+                  fs:(double)fs
+             options:(NSDictionary *)options
+             resolve:(RCTPromiseResolveBlock)resolve
+              reject:(RCTPromiseRejectBlock)reject
+#else
+RCT_EXPORT_METHOD(analyzeAsync:(NSArray<NSNumber*>*)signal
+                  fs:(double)fs
+                  options:(NSDictionary*)options
+                  resolver:(RCTPromiseResolveBlock)resolve
+                  rejecter:(RCTPromiseRejectBlock)reject)
+#endif
+{
+    dispatch_async(dispatch_get_global_queue(QOS_CLASS_USER_INITIATED, 0), ^{
+        @try {
+            id res = [self analyze:signal fs:fs options:options];
+            resolve(res);
+        } @catch (NSException* e) {
+            reject(@"analyze_error", e.reason, nil);
+        }
+    });
+}
+
+#if RCT_NEW_ARCH_ENABLED
+- (NSDictionary *)analyzeRR:(NSArray *)rr
+                    options:(NSDictionary *)options
+#else
 RCT_EXPORT_BLOCKING_SYNCHRONOUS_METHOD(analyzeRR:(NSArray<NSNumber*>*)rr
                                     options:(NSDictionary*)options)
+#endif
 {
     std::vector<double> rrms; rrms.reserve(rr.count);
     for (NSNumber* n in rr) rrms.push_back([n doubleValue]);
@@ -711,10 +836,17 @@ RCT_EXPORT_BLOCKING_SYNCHRONOUS_METHOD(analyzeRR:(NSArray<NSNumber*>*)rr
     return out;
 }
 
+#if RCT_NEW_ARCH_ENABLED
+- (void)analyzeRRAsync:(NSArray *)rr
+               options:(NSDictionary *)options
+               resolve:(RCTPromiseResolveBlock)resolve
+                reject:(RCTPromiseRejectBlock)reject
+#else
 RCT_EXPORT_METHOD(analyzeRRAsync:(NSArray<NSNumber*>*)rr
                   options:(NSDictionary*)options
                   resolver:(RCTPromiseResolveBlock)resolve
                   rejecter:(RCTPromiseRejectBlock)reject)
+#endif
 {
     dispatch_async(dispatch_get_global_queue(QOS_CLASS_USER_INITIATED, 0), ^{
         @try {
@@ -726,14 +858,20 @@ RCT_EXPORT_METHOD(analyzeRRAsync:(NSArray<NSNumber*>*)rr
     });
 }
 
+#if RCT_NEW_ARCH_ENABLED
+- (NSDictionary *)analyzeSegmentwise:(NSArray *)signal
+                                   fs:(double)fs
+                              options:(NSDictionary *)options
+#else
 RCT_EXPORT_BLOCKING_SYNCHRONOUS_METHOD(analyzeSegmentwise:(NSArray<NSNumber*>*)signal
-                                      fs:(nonnull NSNumber*)fs
+                                      fs:(double)fs
                                       options:(NSDictionary*)options)
+#endif
 {
     std::vector<double> x; x.reserve(signal.count);
     for (NSNumber* n in signal) x.push_back([n doubleValue]);
     heartpy::Options opt = optionsFromNSDictionary(options);
-    auto res = heartpy::analyzeSignalSegmentwise(x, [fs doubleValue], opt);
+    auto res = heartpy::analyzeSignalSegmentwise(x, fs, opt);
     NSMutableDictionary* out = [NSMutableDictionary new];
     out[@"bpm"] = @(res.bpm);
     out[@"sdnn"] = @(res.sdnn);
@@ -750,11 +888,19 @@ RCT_EXPORT_BLOCKING_SYNCHRONOUS_METHOD(analyzeSegmentwise:(NSArray<NSNumber*>*)s
     return out;
 }
 
+#if RCT_NEW_ARCH_ENABLED
+- (void)analyzeSegmentwiseAsync:(NSArray *)signal
+                               fs:(double)fs
+                          options:(NSDictionary *)options
+                          resolve:(RCTPromiseResolveBlock)resolve
+                           reject:(RCTPromiseRejectBlock)reject
+#else
 RCT_EXPORT_METHOD(analyzeSegmentwiseAsync:(NSArray<NSNumber*>*)signal
-                  fs:(nonnull NSNumber*)fs
+                  fs:(double)fs
                   options:(NSDictionary*)options
                   resolver:(RCTPromiseResolveBlock)resolve
                   rejecter:(RCTPromiseRejectBlock)reject)
+#endif
 {
     dispatch_async(dispatch_get_global_queue(QOS_CLASS_USER_INITIATED, 0), ^{
         @try {
@@ -766,22 +912,34 @@ RCT_EXPORT_METHOD(analyzeSegmentwiseAsync:(NSArray<NSNumber*>*)signal
     });
 }
 
+#if RCT_NEW_ARCH_ENABLED
+- (NSArray<NSNumber *> *)interpolateClipping:(NSArray *)signal
+                                           fs:(double)fs
+                                    threshold:(NSNumber *)threshold
+#else
 // Preprocessing exports
 RCT_EXPORT_BLOCKING_SYNCHRONOUS_METHOD(interpolateClipping:(NSArray<NSNumber*>*)signal
-                                      fs:(nonnull NSNumber*)fs
+                                      fs:(double)fs
                                       threshold:(nonnull NSNumber*)threshold)
+#endif
 {
     std::vector<double> x; x.reserve(signal.count);
     for (NSNumber* n in signal) x.push_back([n doubleValue]);
-    auto y = heartpy::interpolateClipping(x, [fs doubleValue], [threshold doubleValue]);
+    auto y = heartpy::interpolateClipping(x, fs, [threshold doubleValue]);
     NSMutableArray* out = [NSMutableArray arrayWithCapacity:y.size()];
     for (double v : y) [out addObject:@(v)];
     return out;
 }
 
+#if RCT_NEW_ARCH_ENABLED
+- (NSArray<NSNumber *> *)hampelFilter:(NSArray *)signal
+                           windowSize:(NSNumber *)windowSize
+                            threshold:(NSNumber *)threshold
+#else
 RCT_EXPORT_BLOCKING_SYNCHRONOUS_METHOD(hampelFilter:(NSArray<NSNumber*>*)signal
                                       windowSize:(nonnull NSNumber*)windowSize
                                       threshold:(nonnull NSNumber*)threshold)
+#endif
 {
     std::vector<double> x; x.reserve(signal.count);
     for (NSNumber* n in signal) x.push_back([n doubleValue]);
@@ -791,9 +949,15 @@ RCT_EXPORT_BLOCKING_SYNCHRONOUS_METHOD(hampelFilter:(NSArray<NSNumber*>*)signal
     return out;
 }
 
+#if RCT_NEW_ARCH_ENABLED
+- (NSArray<NSNumber *> *)scaleData:(NSArray *)signal
+                             newMin:(NSNumber *)newMin
+                             newMax:(NSNumber *)newMax
+#else
 RCT_EXPORT_BLOCKING_SYNCHRONOUS_METHOD(scaleData:(NSArray<NSNumber*>*)signal
                                    newMin:(nonnull NSNumber*)newMin
                                    newMax:(nonnull NSNumber*)newMax)
+#endif
 {
     std::vector<double> x; x.reserve(signal.count);
     for (NSNumber* n in signal) x.push_back([n doubleValue]);
@@ -822,23 +986,32 @@ RCT_EXPORT_BLOCKING_SYNCHRONOUS_METHOD(scaleData:(NSArray<NSNumber*>*)signal
 	}
 }
 
+#if RCT_NEW_ARCH_ENABLED
+- (NSNumber *)installJSI
+#else
 RCT_EXPORT_BLOCKING_SYNCHRONOUS_METHOD(installJSI)
+#endif
 {
-	NSLog(@"[HeartPyModule] installJSI called - React Native 0.74+ has JSI limitations");
-	
-	// In RN 0.74+, JSI runtime access is restricted
-	// For now, return NO to use NativeModule path which works perfectly
-	NSLog(@"[HeartPyModule] Using NativeModule fallback (recommended for RN 0.74+)");
-	return @NO;
+    NSLog(@"[HeartPyModule] installJSI called - React Native 0.74+ has JSI limitations");
+    // In RN 0.74+, JSI runtime access is restricted; keep fallback for now.
+    NSLog(@"[HeartPyModule] Using NativeModule fallback (recommended for RN 0.74+)");
+    return @NO;
 }
 
 // MARK: - Realtime Streaming (NativeModules P0)
 
+#if RCT_NEW_ARCH_ENABLED
+- (void)rtCreate:(double)fs
+         options:(NSDictionary * _Nullable)options
+         resolve:(RCTPromiseResolveBlock)resolve
+          reject:(RCTPromiseRejectBlock)reject
+#else
 // Create realtime analyzer and return opaque handle (as number)
 RCT_EXPORT_METHOD(rtCreate:(double)fs
                   options:(NSDictionary *)options
                   resolver:(RCTPromiseResolveBlock)resolve
                   rejecter:(RCTPromiseRejectBlock)reject)
+#endif
 {
     @try {
         if (fs <= 0.0) { reject(@"HEARTPY_E001", @"Invalid sample rate: must be 1-10000 Hz", nil); return; }
@@ -851,25 +1024,39 @@ RCT_EXPORT_METHOD(rtCreate:(double)fs
             reject(nscode, nsmsg, nil);
             return;
         }
-        void* handle = hp_rt_create(fs, &opt);
-        if (!handle) { reject(@"HEARTPY_E004", @"hp_rt_create returned null", nil); return; }
-        resolve(@((long)handle));
+        void* handlePtr = hp_rt_create(fs, &opt);
+        if (!handlePtr) { reject(@"HEARTPY_E004", @"hp_rt_create returned null", nil); return; }
+        resolve(@((double)(uintptr_t)handlePtr));
     } @catch (NSException* e) {
         reject(@"HEARTPY_E900", e.reason, nil);
     }
 }
 
+#if RCT_NEW_ARCH_ENABLED
+- (void)rtSetWindow:(double)handle
+      windowSeconds:(double)windowSeconds
+            resolve:(RCTPromiseResolveBlock)resolve
+             reject:(RCTPromiseRejectBlock)reject
+#else
 RCT_EXPORT_METHOD(rtSetWindow:(nonnull NSNumber*)handle
                   windowSeconds:(nonnull NSNumber*)windowSeconds
                   resolver:(RCTPromiseResolveBlock)resolve
                   rejecter:(RCTPromiseRejectBlock)reject)
+#endif
 {
     @try {
-        if (handle == nil || windowSeconds == nil) {
+#if RCT_NEW_ARCH_ENABLED
+        double handleValue = handle;
+        double windowValue = windowSeconds;
+#else
+        double handleValue = [handle doubleValue];
+        double windowValue = [windowSeconds doubleValue];
+#endif
+        if (handleValue == 0.0 || windowValue <= 0.0) {
             reject(@"rt_set_window_invalid_args", @"Invalid handle or windowSeconds", nil);
             return;
         }
-        hp_rt_set_window((void*)[handle longValue], [windowSeconds doubleValue]);
+        hp_rt_set_window((void*)(uintptr_t)llround(handleValue), windowValue);
         resolve(nil);
     } @catch (NSException* e) {
         reject(@"rt_set_window_exception", e.reason, nil);
@@ -877,15 +1064,28 @@ RCT_EXPORT_METHOD(rtSetWindow:(nonnull NSNumber*)handle
 }
 
 // Push a chunk of samples (number[])
+#if RCT_NEW_ARCH_ENABLED
+- (void)rtPush:(double)handle
+       samples:(NSArray *)samples
+            t0:(NSNumber *)t0
+       resolve:(RCTPromiseResolveBlock)resolve
+        reject:(RCTPromiseRejectBlock)reject
+#else
 RCT_EXPORT_METHOD(rtPush:(nonnull NSNumber*)handle
                   samples:(NSArray<NSNumber*>*)samples
                   timestamp:(nonnull NSNumber*)t0
                   resolver:(RCTPromiseResolveBlock)resolve
                   rejecter:(RCTPromiseRejectBlock)reject)
+#endif
 {
     @try {
-        if (handle == nil || samples == nil || samples.count == 0) { reject(@"rt_push_invalid_args", @"Invalid handle or empty samples", nil); return; }
-        void* h = (void*)[handle longValue];
+#if RCT_NEW_ARCH_ENABLED
+        double handleValue = handle;
+#else
+        double handleValue = [handle doubleValue];
+#endif
+        if (handleValue == 0.0 || samples == nil || samples.count == 0) { reject(@"rt_push_invalid_args", @"Invalid handle or empty samples", nil); return; }
+        void* h = (void*)(uintptr_t)llround(handleValue);
         const NSUInteger n = samples.count;
         std::vector<float> x; x.reserve(n);
         for (NSNumber* v in samples) x.push_back([v floatValue]);
@@ -898,21 +1098,34 @@ RCT_EXPORT_METHOD(rtPush:(nonnull NSNumber*)handle
 }
 
 // ✅ CRITICAL P0 FIX: Push samples with per-sample timestamps
+#if RCT_NEW_ARCH_ENABLED
+- (void)rtPushTs:(double)handle
+         samples:(NSArray *)xs
+      timestamps:(NSArray *)ts
+         resolve:(RCTPromiseResolveBlock)resolve
+          reject:(RCTPromiseRejectBlock)reject
+#else
 RCT_EXPORT_METHOD(rtPushTs:(nonnull NSNumber*)handle
                   samples:(NSArray<NSNumber*>*)xs
                   timestamps:(NSArray<NSNumber*>*)ts
                   resolver:(RCTPromiseResolveBlock)resolve
                   rejecter:(RCTPromiseRejectBlock)reject)
+#endif
 {
     @try {
-        if (handle == nil || xs == nil || ts == nil || xs.count != ts.count || xs.count == 0) {
+#if RCT_NEW_ARCH_ENABLED
+        double handleValue = handle;
+#else
+        double handleValue = [handle doubleValue];
+#endif
+        if (handleValue == 0.0 || xs == nil || ts == nil || xs.count != ts.count || xs.count == 0) {
             reject(@"rt_push_ts_invalid_args", @"Invalid handle or mismatched arrays", nil);
             return;
         }
         
-        void* h = (void*)[handle longValue];
+        void* h = (void*)(uintptr_t)llround(handleValue);
         const NSUInteger n = xs.count;
-        
+
         std::vector<float> samples; samples.reserve(n);
         for (NSNumber* v in xs) samples.push_back([v floatValue]);
         
@@ -926,14 +1139,26 @@ RCT_EXPORT_METHOD(rtPushTs:(nonnull NSNumber*)handle
     }
 }
 
+#if RCT_NEW_ARCH_ENABLED
+- (void)rtPoll:(double)handle
+       resolve:(RCTPromiseResolveBlock)resolve
+        reject:(RCTPromiseRejectBlock)reject
+#else
 // Poll for latest metrics; returns object or null
 RCT_EXPORT_METHOD(rtPoll:(nonnull NSNumber*)handle
                   resolver:(RCTPromiseResolveBlock)resolve
                   rejecter:(RCTPromiseRejectBlock)reject)
+#endif
 {
     @try {
+#if RCT_NEW_ARCH_ENABLED
+        double handleValue = handle;
+#else
         if (handle == nil) { reject(@"rt_poll_invalid_args", @"Invalid handle", nil); return; }
-        void* h = (void*)[handle longValue];
+        double handleValue = [handle doubleValue];
+#endif
+        if (handleValue == 0.0) { reject(@"rt_poll_invalid_args", @"Invalid handle", nil); return; }
+        void* h = (void*)(uintptr_t)llround(handleValue);
         heartpy::HeartMetrics res;
         if (!hp_rt_poll(h, &res)) { resolve(nil); return; }
 
@@ -1049,14 +1274,25 @@ RCT_EXPORT_METHOD(rtPoll:(nonnull NSNumber*)handle
     }
 }
 
-// Destroy analyzer and release native resources
+#if RCT_NEW_ARCH_ENABLED
+- (void)rtDestroy:(double)handle
+          resolve:(RCTPromiseResolveBlock)resolve
+           reject:(RCTPromiseRejectBlock)reject
+#else
 RCT_EXPORT_METHOD(rtDestroy:(nonnull NSNumber*)handle
                   resolver:(RCTPromiseResolveBlock)resolve
                   rejecter:(RCTPromiseRejectBlock)reject)
+#endif
 {
     @try {
+#if RCT_NEW_ARCH_ENABLED
+        double handleValue = handle;
+#else
         if (handle == nil) { reject(@"rt_destroy_invalid_args", @"Invalid handle", nil); return; }
-        void* h = (void*)[handle longValue];
+        double handleValue = [handle doubleValue];
+#endif
+        if (handleValue == 0.0) { reject(@"rt_destroy_invalid_args", @"Invalid handle", nil); return; }
+        void* h = (void*)(uintptr_t)llround(handleValue);
         hp_rt_destroy(h);
         resolve(nil);
     } @catch (NSException* e) {

@@ -12,11 +12,11 @@
 		13B07FBF1A68108700A75B9A /* Images.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 13B07FB51A68108700A75B9A /* Images.xcassets */; };
 		13B07FC11A68108700A75B9A /* main.m in Sources */ = {isa = PBXBuildFile; fileRef = 13B07FB71A68108700A75B9A /* main.m */; };
 		5F18A90F86BF522702299C37 /* PrivacyInfo.xcprivacy in Resources */ = {isa = PBXBuildFile; fileRef = D30B189352DEDDEB88B3E236 /* PrivacyInfo.xcprivacy */; };
-		68D7F6FA3846948F9B08012F /* libPods-HeartPyApp-HeartPyAppTests.a in Frameworks */ = {isa = PBXBuildFile; fileRef = F5B4C489E2BA4062B3436AF4 /* libPods-HeartPyApp-HeartPyAppTests.a */; };
 		7B8C9D001234567800000002 /* PPGMeanPlugin.m in Sources */ = {isa = PBXBuildFile; fileRef = 7B8C9D001234567800000001 /* PPGMeanPlugin.m */; };
 		7B8C9D001234567800000004 /* PPGCameraManager.mm in Sources */ = {isa = PBXBuildFile; fileRef = 7B8C9D001234567800000003 /* PPGCameraManager.mm */; };
 		81AB9BB82411601600AC10FF /* LaunchScreen.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = 81AB9BB72411601600AC10FF /* LaunchScreen.storyboard */; };
-		98C4AB5C5153003C42847D8F /* libPods-HeartPyApp.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 7A830DE967FAF6934B64DC9A /* libPods-HeartPyApp.a */; };
+		A360554A94D47FAB0276D772 /* libPods-HeartPyApp-HeartPyAppTests.a in Frameworks */ = {isa = PBXBuildFile; fileRef = FBD25532CF3BBDE81215FB87 /* libPods-HeartPyApp-HeartPyAppTests.a */; };
+		E0C7BB24D273654AEAED4947 /* libPods-HeartPyApp.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 2751009F780BFA52E388AE89 /* libPods-HeartPyApp.a */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
@@ -33,7 +33,6 @@
 		00E356EE1AD99517003FC87E /* HeartPyAppTests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = HeartPyAppTests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
 		00E356F11AD99517003FC87E /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
 		00E356F21AD99517003FC87E /* HeartPyAppTests.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = HeartPyAppTests.m; sourceTree = "<group>"; };
-		04C731584A24CB1BA0D3C91A /* Pods-HeartPyApp.release.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-HeartPyApp.release.xcconfig"; path = "Target Support Files/Pods-HeartPyApp/Pods-HeartPyApp.release.xcconfig"; sourceTree = "<group>"; };
 		13B07F961A680F5B00A75B9A /* HeartPyApp.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = HeartPyApp.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		13B07FAF1A68108700A75B9A /* AppDelegate.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = AppDelegate.h; path = HeartPyApp/AppDelegate.h; sourceTree = "<group>"; };
 		13B07FB01A68108700A75B9A /* AppDelegate.mm */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.objcpp; name = AppDelegate.mm; path = HeartPyApp/AppDelegate.mm; sourceTree = "<group>"; };
@@ -41,17 +40,18 @@
 		13B07FB61A68108700A75B9A /* Info.plist */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.plist.xml; name = Info.plist; path = HeartPyApp/Info.plist; sourceTree = "<group>"; };
 		13B07FB71A68108700A75B9A /* main.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = main.m; path = HeartPyApp/main.m; sourceTree = "<group>"; };
 		13B07FB81A68108700A75B9A /* PrivacyInfo.xcprivacy */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.plist.xml; name = PrivacyInfo.xcprivacy; path = HeartPyApp/PrivacyInfo.xcprivacy; sourceTree = "<group>"; };
-		20353A36CFB82C2D52B644CC /* Pods-HeartPyApp-HeartPyAppTests.debug.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-HeartPyApp-HeartPyAppTests.debug.xcconfig"; path = "Target Support Files/Pods-HeartPyApp-HeartPyAppTests/Pods-HeartPyApp-HeartPyAppTests.debug.xcconfig"; sourceTree = "<group>"; };
-		7A830DE967FAF6934B64DC9A /* libPods-HeartPyApp.a */ = {isa = PBXFileReference; explicitFileType = archive.ar; includeInIndex = 0; path = "libPods-HeartPyApp.a"; sourceTree = BUILT_PRODUCTS_DIR; };
+		2751009F780BFA52E388AE89 /* libPods-HeartPyApp.a */ = {isa = PBXFileReference; explicitFileType = archive.ar; includeInIndex = 0; path = "libPods-HeartPyApp.a"; sourceTree = BUILT_PRODUCTS_DIR; };
+		424225BB269CDABF177DC3EF /* Pods-HeartPyApp.debug.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-HeartPyApp.debug.xcconfig"; path = "Target Support Files/Pods-HeartPyApp/Pods-HeartPyApp.debug.xcconfig"; sourceTree = "<group>"; };
 		7B8C9D001234567800000001 /* PPGMeanPlugin.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = PPGMeanPlugin.m; sourceTree = "<group>"; };
 		7B8C9D001234567800000003 /* PPGCameraManager.mm */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.objcpp; path = PPGCameraManager.mm; sourceTree = "<group>"; };
 		7B8C9D001234567800000005 /* PPGCameraManager.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = PPGCameraManager.h; sourceTree = "<group>"; };
 		81AB9BB72411601600AC10FF /* LaunchScreen.storyboard */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = file.storyboard; name = LaunchScreen.storyboard; path = HeartPyApp/LaunchScreen.storyboard; sourceTree = "<group>"; };
-		87A99BCCDC3FC87A4D70A20F /* Pods-HeartPyApp-HeartPyAppTests.release.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-HeartPyApp-HeartPyAppTests.release.xcconfig"; path = "Target Support Files/Pods-HeartPyApp-HeartPyAppTests/Pods-HeartPyApp-HeartPyAppTests.release.xcconfig"; sourceTree = "<group>"; };
+		88AEB4338647E213485581FF /* Pods-HeartPyApp-HeartPyAppTests.release.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-HeartPyApp-HeartPyAppTests.release.xcconfig"; path = "Target Support Files/Pods-HeartPyApp-HeartPyAppTests/Pods-HeartPyApp-HeartPyAppTests.release.xcconfig"; sourceTree = "<group>"; };
+		9DCC87863ACBB9381B3DD138 /* Pods-HeartPyApp.release.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-HeartPyApp.release.xcconfig"; path = "Target Support Files/Pods-HeartPyApp/Pods-HeartPyApp.release.xcconfig"; sourceTree = "<group>"; };
 		D30B189352DEDDEB88B3E236 /* PrivacyInfo.xcprivacy */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xml; name = PrivacyInfo.xcprivacy; path = HeartPyApp/PrivacyInfo.xcprivacy; sourceTree = "<group>"; };
+		E1E5EBC708816224AB385319 /* Pods-HeartPyApp-HeartPyAppTests.debug.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-HeartPyApp-HeartPyAppTests.debug.xcconfig"; path = "Target Support Files/Pods-HeartPyApp-HeartPyAppTests/Pods-HeartPyApp-HeartPyAppTests.debug.xcconfig"; sourceTree = "<group>"; };
 		ED297162215061F000B7C4FE /* JavaScriptCore.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = JavaScriptCore.framework; path = System/Library/Frameworks/JavaScriptCore.framework; sourceTree = SDKROOT; };
-		F03255685AB5AD87AF76CA7E /* Pods-HeartPyApp.debug.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-HeartPyApp.debug.xcconfig"; path = "Target Support Files/Pods-HeartPyApp/Pods-HeartPyApp.debug.xcconfig"; sourceTree = "<group>"; };
-		F5B4C489E2BA4062B3436AF4 /* libPods-HeartPyApp-HeartPyAppTests.a */ = {isa = PBXFileReference; explicitFileType = archive.ar; includeInIndex = 0; path = "libPods-HeartPyApp-HeartPyAppTests.a"; sourceTree = BUILT_PRODUCTS_DIR; };
+		FBD25532CF3BBDE81215FB87 /* libPods-HeartPyApp-HeartPyAppTests.a */ = {isa = PBXFileReference; explicitFileType = archive.ar; includeInIndex = 0; path = "libPods-HeartPyApp-HeartPyAppTests.a"; sourceTree = BUILT_PRODUCTS_DIR; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -59,7 +59,7 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				68D7F6FA3846948F9B08012F /* libPods-HeartPyApp-HeartPyAppTests.a in Frameworks */,
+				A360554A94D47FAB0276D772 /* libPods-HeartPyApp-HeartPyAppTests.a in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -67,7 +67,7 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				98C4AB5C5153003C42847D8F /* libPods-HeartPyApp.a in Frameworks */,
+				E0C7BB24D273654AEAED4947 /* libPods-HeartPyApp.a in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -113,8 +113,8 @@
 			isa = PBXGroup;
 			children = (
 				ED297162215061F000B7C4FE /* JavaScriptCore.framework */,
-				7A830DE967FAF6934B64DC9A /* libPods-HeartPyApp.a */,
-				F5B4C489E2BA4062B3436AF4 /* libPods-HeartPyApp-HeartPyAppTests.a */,
+				2751009F780BFA52E388AE89 /* libPods-HeartPyApp.a */,
+				FBD25532CF3BBDE81215FB87 /* libPods-HeartPyApp-HeartPyAppTests.a */,
 			);
 			name = Frameworks;
 			sourceTree = "<group>";
@@ -153,10 +153,10 @@
 		BBD78D7AC51CEA395F1C20DB /* Pods */ = {
 			isa = PBXGroup;
 			children = (
-				F03255685AB5AD87AF76CA7E /* Pods-HeartPyApp.debug.xcconfig */,
-				04C731584A24CB1BA0D3C91A /* Pods-HeartPyApp.release.xcconfig */,
-				20353A36CFB82C2D52B644CC /* Pods-HeartPyApp-HeartPyAppTests.debug.xcconfig */,
-				87A99BCCDC3FC87A4D70A20F /* Pods-HeartPyApp-HeartPyAppTests.release.xcconfig */,
+				424225BB269CDABF177DC3EF /* Pods-HeartPyApp.debug.xcconfig */,
+				9DCC87863ACBB9381B3DD138 /* Pods-HeartPyApp.release.xcconfig */,
+				E1E5EBC708816224AB385319 /* Pods-HeartPyApp-HeartPyAppTests.debug.xcconfig */,
+				88AEB4338647E213485581FF /* Pods-HeartPyApp-HeartPyAppTests.release.xcconfig */,
 			);
 			path = Pods;
 			sourceTree = "<group>";
@@ -168,11 +168,12 @@
 			isa = PBXNativeTarget;
 			buildConfigurationList = 00E357021AD99517003FC87E /* Build configuration list for PBXNativeTarget "HeartPyAppTests" */;
 			buildPhases = (
-				2D8B9B0A4326E88DC48F4CD7 /* [CP] Check Pods Manifest.lock */,
+				3D9CB45FB7E5CAEF1A216F64 /* [CP] Check Pods Manifest.lock */,
 				00E356EA1AD99517003FC87E /* Sources */,
 				00E356EB1AD99517003FC87E /* Frameworks */,
 				00E356EC1AD99517003FC87E /* Resources */,
-				3A47471C31BBE5804B3B5F9B /* [CP] Copy Pods Resources */,
+				52311442EAC41229A38A7AEE /* [CP] Embed Pods Frameworks */,
+				AC8493E6F417835972AEE3B9 /* [CP] Copy Pods Resources */,
 			);
 			buildRules = (
 			);
@@ -188,12 +189,13 @@
 			isa = PBXNativeTarget;
 			buildConfigurationList = 13B07F931A680F5B00A75B9A /* Build configuration list for PBXNativeTarget "HeartPyApp" */;
 			buildPhases = (
-				29C7C21729E3034B05FEE5DF /* [CP] Check Pods Manifest.lock */,
+				7D5B4F5272C1073521C9E4AB /* [CP] Check Pods Manifest.lock */,
 				13B07F871A680F5B00A75B9A /* Sources */,
 				13B07F8C1A680F5B00A75B9A /* Frameworks */,
 				13B07F8E1A680F5B00A75B9A /* Resources */,
 				00DD1BFF1BD5951E006B06BC /* Bundle React Native code and images */,
-				D0CE966143E3F3E62E8ABCCE /* [CP] Copy Pods Resources */,
+				4172F34EB1F02021F3EC272B /* [CP] Embed Pods Frameworks */,
+				AAE92E7708D5A8D8F6912873 /* [CP] Copy Pods Resources */,
 			);
 			buildRules = (
 			);
@@ -278,29 +280,7 @@
 			shellPath = /bin/sh;
 			shellScript = "export NODE_BINARY=/opt/homebrew/bin/node\n../node_modules/react-native/scripts/react-native-xcode.sh\n";
 		};
-		29C7C21729E3034B05FEE5DF /* [CP] Check Pods Manifest.lock */ = {
-			isa = PBXShellScriptBuildPhase;
-			buildActionMask = 2147483647;
-			files = (
-			);
-			inputFileListPaths = (
-			);
-			inputPaths = (
-				"${PODS_PODFILE_DIR_PATH}/Podfile.lock",
-				"${PODS_ROOT}/Manifest.lock",
-			);
-			name = "[CP] Check Pods Manifest.lock";
-			outputFileListPaths = (
-			);
-			outputPaths = (
-				"$(DERIVED_FILE_DIR)/Pods-HeartPyApp-checkManifestLockResult.txt",
-			);
-			runOnlyForDeploymentPostprocessing = 0;
-			shellPath = /bin/sh;
-			shellScript = "diff \"${PODS_PODFILE_DIR_PATH}/Podfile.lock\" \"${PODS_ROOT}/Manifest.lock\" > /dev/null\nif [ $? != 0 ] ; then\n    # print error to STDERR\n    echo \"error: The sandbox is not in sync with the Podfile.lock. Run 'pod install' or update your CocoaPods installation.\" >&2\n    exit 1\nfi\n# This output is used by Xcode 'outputs' to avoid re-running this script phase.\necho \"SUCCESS\" > \"${SCRIPT_OUTPUT_FILE_0}\"\n";
-			showEnvVarsInLog = 0;
-		};
-		2D8B9B0A4326E88DC48F4CD7 /* [CP] Check Pods Manifest.lock */ = {
+		3D9CB45FB7E5CAEF1A216F64 /* [CP] Check Pods Manifest.lock */ = {
 			isa = PBXShellScriptBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
@@ -322,24 +302,63 @@
 			shellScript = "diff \"${PODS_PODFILE_DIR_PATH}/Podfile.lock\" \"${PODS_ROOT}/Manifest.lock\" > /dev/null\nif [ $? != 0 ] ; then\n    # print error to STDERR\n    echo \"error: The sandbox is not in sync with the Podfile.lock. Run 'pod install' or update your CocoaPods installation.\" >&2\n    exit 1\nfi\n# This output is used by Xcode 'outputs' to avoid re-running this script phase.\necho \"SUCCESS\" > \"${SCRIPT_OUTPUT_FILE_0}\"\n";
 			showEnvVarsInLog = 0;
 		};
-		3A47471C31BBE5804B3B5F9B /* [CP] Copy Pods Resources */ = {
+		4172F34EB1F02021F3EC272B /* [CP] Embed Pods Frameworks */ = {
 			isa = PBXShellScriptBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
 			);
 			inputFileListPaths = (
-				"${PODS_ROOT}/Target Support Files/Pods-HeartPyApp-HeartPyAppTests/Pods-HeartPyApp-HeartPyAppTests-resources-${CONFIGURATION}-input-files.xcfilelist",
+				"${PODS_ROOT}/Target Support Files/Pods-HeartPyApp/Pods-HeartPyApp-frameworks-${CONFIGURATION}-input-files.xcfilelist",
 			);
-			name = "[CP] Copy Pods Resources";
+			name = "[CP] Embed Pods Frameworks";
 			outputFileListPaths = (
-				"${PODS_ROOT}/Target Support Files/Pods-HeartPyApp-HeartPyAppTests/Pods-HeartPyApp-HeartPyAppTests-resources-${CONFIGURATION}-output-files.xcfilelist",
+				"${PODS_ROOT}/Target Support Files/Pods-HeartPyApp/Pods-HeartPyApp-frameworks-${CONFIGURATION}-output-files.xcfilelist",
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 			shellPath = /bin/sh;
-			shellScript = "\"${PODS_ROOT}/Target Support Files/Pods-HeartPyApp-HeartPyAppTests/Pods-HeartPyApp-HeartPyAppTests-resources.sh\"\n";
+			shellScript = "\"${PODS_ROOT}/Target Support Files/Pods-HeartPyApp/Pods-HeartPyApp-frameworks.sh\"\n";
 			showEnvVarsInLog = 0;
 		};
-		D0CE966143E3F3E62E8ABCCE /* [CP] Copy Pods Resources */ = {
+		52311442EAC41229A38A7AEE /* [CP] Embed Pods Frameworks */ = {
+			isa = PBXShellScriptBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			inputFileListPaths = (
+				"${PODS_ROOT}/Target Support Files/Pods-HeartPyApp-HeartPyAppTests/Pods-HeartPyApp-HeartPyAppTests-frameworks-${CONFIGURATION}-input-files.xcfilelist",
+			);
+			name = "[CP] Embed Pods Frameworks";
+			outputFileListPaths = (
+				"${PODS_ROOT}/Target Support Files/Pods-HeartPyApp-HeartPyAppTests/Pods-HeartPyApp-HeartPyAppTests-frameworks-${CONFIGURATION}-output-files.xcfilelist",
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+			shellPath = /bin/sh;
+			shellScript = "\"${PODS_ROOT}/Target Support Files/Pods-HeartPyApp-HeartPyAppTests/Pods-HeartPyApp-HeartPyAppTests-frameworks.sh\"\n";
+			showEnvVarsInLog = 0;
+		};
+		7D5B4F5272C1073521C9E4AB /* [CP] Check Pods Manifest.lock */ = {
+			isa = PBXShellScriptBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			inputFileListPaths = (
+			);
+			inputPaths = (
+				"${PODS_PODFILE_DIR_PATH}/Podfile.lock",
+				"${PODS_ROOT}/Manifest.lock",
+			);
+			name = "[CP] Check Pods Manifest.lock";
+			outputFileListPaths = (
+			);
+			outputPaths = (
+				"$(DERIVED_FILE_DIR)/Pods-HeartPyApp-checkManifestLockResult.txt",
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+			shellPath = /bin/sh;
+			shellScript = "diff \"${PODS_PODFILE_DIR_PATH}/Podfile.lock\" \"${PODS_ROOT}/Manifest.lock\" > /dev/null\nif [ $? != 0 ] ; then\n    # print error to STDERR\n    echo \"error: The sandbox is not in sync with the Podfile.lock. Run 'pod install' or update your CocoaPods installation.\" >&2\n    exit 1\nfi\n# This output is used by Xcode 'outputs' to avoid re-running this script phase.\necho \"SUCCESS\" > \"${SCRIPT_OUTPUT_FILE_0}\"\n";
+			showEnvVarsInLog = 0;
+		};
+		AAE92E7708D5A8D8F6912873 /* [CP] Copy Pods Resources */ = {
 			isa = PBXShellScriptBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
@@ -354,6 +373,23 @@
 			runOnlyForDeploymentPostprocessing = 0;
 			shellPath = /bin/sh;
 			shellScript = "\"${PODS_ROOT}/Target Support Files/Pods-HeartPyApp/Pods-HeartPyApp-resources.sh\"\n";
+			showEnvVarsInLog = 0;
+		};
+		AC8493E6F417835972AEE3B9 /* [CP] Copy Pods Resources */ = {
+			isa = PBXShellScriptBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			inputFileListPaths = (
+				"${PODS_ROOT}/Target Support Files/Pods-HeartPyApp-HeartPyAppTests/Pods-HeartPyApp-HeartPyAppTests-resources-${CONFIGURATION}-input-files.xcfilelist",
+			);
+			name = "[CP] Copy Pods Resources";
+			outputFileListPaths = (
+				"${PODS_ROOT}/Target Support Files/Pods-HeartPyApp-HeartPyAppTests/Pods-HeartPyApp-HeartPyAppTests-resources-${CONFIGURATION}-output-files.xcfilelist",
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+			shellPath = /bin/sh;
+			shellScript = "\"${PODS_ROOT}/Target Support Files/Pods-HeartPyApp-HeartPyAppTests/Pods-HeartPyApp-HeartPyAppTests-resources.sh\"\n";
 			showEnvVarsInLog = 0;
 		};
 /* End PBXShellScriptBuildPhase section */
@@ -391,7 +427,7 @@
 /* Begin XCBuildConfiguration section */
 		00E356F61AD99517003FC87E /* Debug */ = {
 			isa = XCBuildConfiguration;
-			baseConfigurationReference = 20353A36CFB82C2D52B644CC /* Pods-HeartPyApp-HeartPyAppTests.debug.xcconfig */;
+			baseConfigurationReference = E1E5EBC708816224AB385319 /* Pods-HeartPyApp-HeartPyAppTests.debug.xcconfig */;
 			buildSettings = {
 				BUNDLE_LOADER = "$(TEST_HOST)";
 				GCC_PREPROCESSOR_DEFINITIONS = (
@@ -399,7 +435,7 @@
 					"$(inherited)",
 				);
 				INFOPLIST_FILE = HeartPyAppTests/Info.plist;
-				IPHONEOS_DEPLOYMENT_TARGET = 13.4;
+				IPHONEOS_DEPLOYMENT_TARGET = 15.1;
 				LD_RUNPATH_SEARCH_PATHS = (
 					"$(inherited)",
 					"@executable_path/Frameworks",
@@ -420,12 +456,12 @@
 		};
 		00E356F71AD99517003FC87E /* Release */ = {
 			isa = XCBuildConfiguration;
-			baseConfigurationReference = 87A99BCCDC3FC87A4D70A20F /* Pods-HeartPyApp-HeartPyAppTests.release.xcconfig */;
+			baseConfigurationReference = 88AEB4338647E213485581FF /* Pods-HeartPyApp-HeartPyAppTests.release.xcconfig */;
 			buildSettings = {
 				BUNDLE_LOADER = "$(TEST_HOST)";
 				COPY_PHASE_STRIP = NO;
 				INFOPLIST_FILE = HeartPyAppTests/Info.plist;
-				IPHONEOS_DEPLOYMENT_TARGET = 13.4;
+				IPHONEOS_DEPLOYMENT_TARGET = 15.1;
 				LD_RUNPATH_SEARCH_PATHS = (
 					"$(inherited)",
 					"@executable_path/Frameworks",
@@ -446,7 +482,7 @@
 		};
 		13B07F941A680F5B00A75B9A /* Debug */ = {
 			isa = XCBuildConfiguration;
-			baseConfigurationReference = F03255685AB5AD87AF76CA7E /* Pods-HeartPyApp.debug.xcconfig */;
+			baseConfigurationReference = 424225BB269CDABF177DC3EF /* Pods-HeartPyApp.debug.xcconfig */;
 			buildSettings = {
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				CLANG_ENABLE_MODULES = YES;
@@ -454,6 +490,7 @@
 				DEVELOPMENT_TEAM = FNRXUWHVF5;
 				ENABLE_BITCODE = NO;
 				INFOPLIST_FILE = HeartPyApp/Info.plist;
+				IPHONEOS_DEPLOYMENT_TARGET = 15.1;
 				LD_RUNPATH_SEARCH_PATHS = (
 					"$(inherited)",
 					"@executable_path/Frameworks",
@@ -475,13 +512,14 @@
 		};
 		13B07F951A680F5B00A75B9A /* Release */ = {
 			isa = XCBuildConfiguration;
-			baseConfigurationReference = 04C731584A24CB1BA0D3C91A /* Pods-HeartPyApp.release.xcconfig */;
+			baseConfigurationReference = 9DCC87863ACBB9381B3DD138 /* Pods-HeartPyApp.release.xcconfig */;
 			buildSettings = {
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				CLANG_ENABLE_MODULES = YES;
 				CURRENT_PROJECT_VERSION = 1;
 				DEVELOPMENT_TEAM = FNRXUWHVF5;
 				INFOPLIST_FILE = HeartPyApp/Info.plist;
+				IPHONEOS_DEPLOYMENT_TARGET = 15.1;
 				LD_RUNPATH_SEARCH_PATHS = (
 					"$(inherited)",
 					"@executable_path/Frameworks",
@@ -581,7 +619,7 @@
 				REACT_NATIVE_PATH = "${PODS_ROOT}/../../node_modules/react-native";
 				SDKROOT = iphoneos;
 				SWIFT_VERSION = 5.0;
-				USE_HERMES = false;
+				USE_HERMES = true;
 			};
 			name = Debug;
 		};
@@ -658,7 +696,7 @@
 				REACT_NATIVE_PATH = "${PODS_ROOT}/../../node_modules/react-native";
 				SDKROOT = iphoneos;
 				SWIFT_VERSION = 5.0;
-				USE_HERMES = false;
+				USE_HERMES = true;
 				VALIDATE_PRODUCT = YES;
 			};
 			name = Release;
