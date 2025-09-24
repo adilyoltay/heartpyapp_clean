@@ -28,8 +28,8 @@ target 'HeartPyApp' do
     # An absolute path to your application root.
     :app_path => "#{Pod::Config.instance.installation_root}/..",
     :hermes_enabled => true,
-    :new_arch_enabled => false,        # temporarily disable new arch for compatibility
-    :fabric_enabled => false           # keep Fabric off 
+    :new_arch_enabled => false,        # Temporarily disabled for device build
+    :fabric_enabled => false           # Fabric UI renderer disabled
   )
 
   target 'HeartPyAppTests' do
