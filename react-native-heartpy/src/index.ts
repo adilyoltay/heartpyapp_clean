@@ -366,6 +366,7 @@ export class RealtimeAnalyzer {
 					ok &&
 					typeof g.__hpRtCreate === 'function' &&
 					typeof g.__hpRtPush === 'function' &&
+					typeof g.__hpRtPushTs === 'function' &&
 					typeof g.__hpRtPoll === 'function' &&
 					typeof g.__hpRtDestroy === 'function'
 				) {
@@ -473,10 +474,6 @@ export class RealtimeAnalyzer {
 				throw new Error('RealtimeAnalyzer destroyed');
 			}
 			const g: any = global;
-			if (typeof g.__hpRtPushTs !== 'function') {
-				throw new Error('HeartPy JSI pushWithTimestamps not available');
-			}
-			jsiCalls++;
 			const samplesBuf = samples instanceof Float32Array ? samples : new Float32Array(asNumberArray(samples));
 			const timestampsBuf = timestamps instanceof Float64Array ? timestamps : new Float64Array(asNumberArray(timestamps));
 			if (!samplesBuf.length || samplesBuf.length !== timestampsBuf.length) {
@@ -484,8 +481,17 @@ export class RealtimeAnalyzer {
 				err.code = 'HEARTPY_E102';
 				throw err;
 			}
+			const pushTs = typeof g.__hpRtPushTs === 'function' ? g.__hpRtPushTs : null;
+			if (!pushTs) {
+				if (cfg.debug) {
+					console.warn('HeartPy: __hpRtPushTs missing, falling back to push()');
+				}
+				const fallbackT0 = timestampsBuf.length ? timestampsBuf[0] : undefined;
+				return this.push(samplesBuf, fallbackT0);
+			}
+			jsiCalls++;
 			const t1 = Date.now();
-			g.__hpRtPushTs(this.jsiId, samplesBuf, timestampsBuf);
+			pushTs(this.jsiId, samplesBuf, timestampsBuf);
 			recordDuration(pushDurationsMs, Date.now() - t1);
 			return;
 		}

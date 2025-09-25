@@ -16,7 +16,7 @@ Pod::Spec.new do |s|
   s.libraries = 'c++'
   s.pod_target_xcconfig = {
     'GCC_PREPROCESSOR_DEFINITIONS' => 'USE_KISSFFT=1',
-    'CLANG_CXX_LANGUAGE_STANDARD' => 'c++20',
+    'CLANG_CXX_LANGUAGE_STANDARD' => 'c++17',
     'CLANG_CXX_LIBRARY' => 'libc++',
     'HEADER_SEARCH_PATHS' => '"$(PODS_TARGET_SRCROOT)" "$(PODS_TARGET_SRCROOT)/kissfft"'
   }
