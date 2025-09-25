@@ -1,19 +1,19 @@
 # New Architecture Readiness
 
-_Status: React Native 0.74.3 baseline across app and module._
+_Status: React Native 0.81.4 baseline with New Architecture enabled across app and module._
 
 ## Dependency Compatibility Matrix
 
 | Dependency | Version (package.json) | Fabric / TurboModule Readiness | Notes & Required Actions |
 | --- | --- | --- | --- |
-| `react-native-vision-camera` | ^4.7.2 | Fabric frame processors supported behind `newArchEnabled` but still beta | Keep manual pod; pair with `react-native-worklets-core` ≥1.6.0. Apply latest `VisionCamera-FrameProcessor` patch before toggling Fabric. |
-| `react-native-reanimated` | 3.8.1 | Fabric-compatible via JSI runtime; TurboModule not applicable | Ensure Babel plugin stays enabled. Requires Hermes for best parity; enable `REANIMATED_FABRIC=1` env when flipping new-arch. |
-| `@shopify/react-native-skia` | ^0.1.214 | Fabric renderer stable; TurboModule N/A | Requires C++17 (already set) and `use_frameworks!` disabled. Recommend running `pod install --repo-update` when bumping. |
-| `react-native-worklets-core` | ^1.6.2 | Fabric-ready; powers VisionCamera frame processors | No extra config beyond Reanimated plugin. Align version with VisionCamera minor to avoid ABI drift. |
-| `react-native-heartpy` (local) | workspace | Native modules still Fabric-in-progress | CMake now repo-relative; add generated code from TurboModule codegen under `react-native-heartpy/cpp/generated`. |
-| `react-native-gesture-handler` | ^2.28.0 | Fabric-ready; TurboModule not used | Keep `GestureHandlerRootView` wrapping root. No extra patches needed. |
+| `react-native-vision-camera` | ^4.9.3 | Fabric frame processors stable with RN 0.81 | Manual pod remains required; keep paired with `react-native-worklets-core` ≥1.9.0. Apply upstream 4.9 frame processor patches when regenerating native plugins. |
+| `react-native-reanimated` | ^3.12.0 | Fabric-compatible via JSI runtime; TurboModule not applicable | Babel plugin must stay enabled. Hermes is required; set `REANIMATED_FABRIC=1` in CI for release builds. |
+| `@shopify/react-native-skia` | ^0.1.325 | Fabric renderer stable; TurboModule N/A | Requires C++17 (matched on both platforms) and `use_frameworks!` disabled. Run `pod install --repo-update` when bumping. |
+| `react-native-worklets-core` | ^1.9.0 | Fabric-ready; powers VisionCamera frame processors | No extra config beyond Reanimated plugin. Stay aligned with VisionCamera minor to avoid ABI drift. |
+| `react-native-heartpy` (local) | workspace | TurboModule + JSI path production-ready | CMake enforces C++17; timestamps preserved in JSI pushes with fallback to `push()` when binding missing. |
+| `react-native-gesture-handler` | ^2.28.1 | Fabric-ready; TurboModule not used | Keep `GestureHandlerRootView` wrapping root. No extra patches needed. |
 
-> For other dependencies, follow the RN upgrade helper notes for 0.74.x. Add rows here as additional native packages are introduced.
+> For other dependencies, follow the RN upgrade helper notes for 0.81.x. Add rows here as additional native packages are introduced.
 
 ## Migration Checklist
 
@@ -40,11 +40,10 @@ _Status: React Native 0.74.3 baseline across app and module._
 - Updated `HeartPyModule.java` to extend the codegenerated spec, adapting every sync/async analyzer, preprocessing call, and realtime entry point to the TurboModule signatures while reusing the existing JNI helpers.
 - Switched `HeartPyPackage` to a `TurboReactPackage` so the module registers as a TurboModule while still supporting the legacy bridge list.
 
-### Remaining Before Enabling TurboModules/Fabric
-- Update the iOS target to opt into the New Architecture (`RCT_NEW_ARCH_ENABLED=1`) once CI smoke passes with the new module.
-- Audit Metro config (asset and sourceExt tweaks) once VisionCamera + Skia begin emitting Fabric components.
-- Add CI jobs for `yarn lint`, Android build (Debug & Release), and iOS Debug build.
-- Keep `HeartPyApp/node_modules` cache warm; Metro reports missing helpers if the app is linked before dependencies install.
+### Remaining Follow-ups
+- Reinstate CI coverage (`yarn lint`, Android assemble, iOS Debug build) on the RN 0.81.4 toolchain.
+- Track VisionCamera/Worklets release notes for additional Fabric toggles or plugin changes.
+- Evaluate enabling release-mode measurements for Skia/JSI paths once QA matrix is refreshed.
 
 ## Validation Commands
 
@@ -64,7 +63,8 @@ xcodebuild -workspace HeartPyApp.xcworkspace -scheme HeartPyApp -configuration D
 # JavaScript checks
 cd ..
 yarn lint
-# Smoke test: launch metro & run app
+yarn test --watch=false
+# Smoke test: launch metro & run app (New Architecture enabled by default)
 yarn start
 # In another terminal
 npx react-native run-ios   # or run-android

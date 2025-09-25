@@ -15,6 +15,7 @@ A high-performance React Native application for real-time photoplethysmography (
 - **Quality Assessment**: Real-time signal quality indicators and artifact rejection
 - **Visualization**: Hardware-accelerated waveform rendering with Skia
 - **Frame Processing**: Vision Camera integration with Worklets for efficient video processing
+- **New Architecture First**: Fabric renderer and TurboModules enabled by default on iOS and Android
 
 ## 📱 Screenshots
 
@@ -27,15 +28,14 @@ A high-performance React Native application for real-time photoplethysmography (
 ## 🛠️ Tech Stack
 
 ### Frontend
-- **React Native 0.74.3**: Latest stable version with New Architecture support
+- **React Native 0.81.4**: New Architecture (Fabric + TurboModules) enabled out of the box
 - **TypeScript**: Type-safe development
 - **React Navigation**: Native navigation experience
 - **Skia**: GPU-accelerated graphics for waveform rendering
 - **Reanimated 3**: Smooth 60 FPS animations
 - **Vision Camera**: Advanced camera processing with frame processors
 
-### Native Modules
-- **C++ Core**: High-performance signal processing engine
+- **C++ Core (C++17)**: High-performance signal processing engine built for the new architecture toolchain
 - **KissFFT**: Fast Fourier Transform for frequency analysis
 - **JSI Bindings**: Direct JavaScript-to-C++ communication
 - **Objective-C++/Java**: Platform-specific bridge code
@@ -57,11 +57,11 @@ A high-performance React Native application for real-time photoplethysmography (
 
 ## 📋 Prerequisites
 
-- **Node.js**: v18.0.0 or higher
+- **Node.js**: v18.18.0 or higher (LTS 20.x recommended by RN 0.81)
 - **React Native CLI**: Latest version
 - **Xcode**: 15.0+ (for iOS development)
-- **Android Studio**: Flamingo or newer (for Android development)
-- **CocoaPods**: 1.12.0+ (iOS dependencies)
+- **Android Studio**: Koala or newer (for Android development)
+- **CocoaPods**: 1.14.0+ (iOS dependencies)
 - **CMake**: 3.18+ (for Android native builds)
 
 ## 🔧 Installation
@@ -74,10 +74,10 @@ cd heartpyapp_clean
 
 ### 2. Install Dependencies
 ```bash
-# Install npm packages
-npm install
+# Install JS packages (Yarn 1.x is the project default)
+yarn install
 
-# iOS specific
+# iOS specific (Fabric / TurboModules are already enabled)
 cd ios && pod install
 cd ..
 ```
@@ -103,7 +103,7 @@ npx react-native run-ios --device
 # Start Metro bundler
 npx react-native start
 
-# Run on emulator/device
+# Run on emulator/device (new architecture is on by default)
 npx react-native run-android
 ```
 
