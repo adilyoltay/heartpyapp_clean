@@ -35,6 +35,7 @@ A high-performance React Native application for real-time photoplethysmography (
 - **Reanimated 3**: Smooth 60 FPS animations
 - **Vision Camera**: Advanced camera processing with frame processors
 
+### Native Modules
 - **C++ Core (C++17)**: High-performance signal processing engine built for the new architecture toolchain
 - **KissFFT**: Fast Fourier Transform for frequency analysis
 - **JSI Bindings**: Direct JavaScript-to-C++ communication
@@ -134,21 +135,21 @@ heartpy-clean/
 
 ### Unit Tests
 ```bash
-npm test
+yarn test
 ```
 
 ### PPG Signal Validation
 ```bash
-npm run check:ppg
+yarn check:ppg
 ```
 
 ### End-to-End Tests
 ```bash
 # iOS
-npm run e2e:ios
+yarn e2e:ios
 
 # Android
-npm run e2e:android
+yarn e2e:android
 ```
 
 ## 📊 Performance
