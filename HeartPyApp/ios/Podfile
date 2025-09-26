@@ -63,11 +63,83 @@ target 'HeartPyApp' do
           #pragma clang diagnostic ignored "-Wcomma"
         FOLLYCFG
       end
+      
+      # Create missing Coroutine.h for Folly with complete stubs
+      coro_dir = File.join(folly_dir, 'folly', 'coro')
+      unless File.exist?(coro_dir)
+        FileUtils.mkdir_p(coro_dir)
+      end
+      
+      coroutine_h = File.join(coro_dir, 'Coroutine.h')
+      File.write(coroutine_h, <<~COROH)
+        #pragma once
+        // Stub for Coroutine.h - coroutines are disabled for mobile builds
+        #include <folly/ExceptionWrapper.h>
+        
+        namespace folly {
+        namespace coro {
+          // Stub types for coroutine support
+          template<typename T = void>
+          struct coroutine_handle {
+            void* ptr = nullptr;
+            static coroutine_handle from_address(void* addr) noexcept {
+              coroutine_handle h;
+              h.ptr = addr;
+              return h;
+            }
+            void* address() const noexcept { return ptr; }
+            void resume() const {}
+            void destroy() const {}
+            bool done() const { return false; }
+            explicit operator bool() const noexcept { return ptr != nullptr; }
+          };
+          
+          struct suspend_never {
+            bool await_ready() const noexcept { return true; }
+            void await_suspend(coroutine_handle<>) const noexcept {}
+            void await_resume() const noexcept {}
+          };
+          
+          struct suspend_always {
+            bool await_ready() const noexcept { return false; }
+            void await_suspend(coroutine_handle<>) const noexcept {}
+            void await_resume() const noexcept {}
+          };
+          
+          template<typename T = void>
+          struct promise {
+            using value_type = T;
+          };
+
+          template<typename Promise>
+          struct get_return_object {
+            using type = typename Promise::value_type;
+          };
+
+          template<typename T = void>
+          struct Generator {
+            using promise_type = promise<T>;
+          };
+
+          template<typename T>
+          class Task {
+          public:
+            T value;
+          };
+
+          inline constexpr bool detect_promise_return_object_eager_conversion() noexcept {
+            return false;
+          }
+        }
+        }
+      COROH
     end
 
     installer.pods_project.targets.each do |target|
       target.build_configurations.each do |config|
         config.build_settings['IPHONEOS_DEPLOYMENT_TARGET'] = '15.4'
+        config.build_settings['CLANG_ALLOW_NON_MODULAR_INCLUDES_IN_FRAMEWORK_MODULES'] = 'YES'
+        config.build_settings['CLANG_ENABLE_MODULES'] = 'YES'
       end
     end
 
@@ -75,7 +147,24 @@ target 'HeartPyApp' do
       aggregate_target.user_project.native_targets.each do |native_target|
         native_target.build_configurations.each do |config|
           config.build_settings['IPHONEOS_DEPLOYMENT_TARGET'] = '15.4'
+          config.build_settings['CLANG_ALLOW_NON_MODULAR_INCLUDES_IN_FRAMEWORK_MODULES'] = 'YES'
+          config.build_settings['CLANG_ENABLE_MODULES'] = 'YES'
         end
+      end
+    end
+
+    # Ensure Yoga headers are visible to React* targets that include <yoga/...>
+    yoga_consumers = [
+      'React-Fabric', 'React-RCTFabric', 'React-Core', 'React-Codegen',
+      'React-graphics', 'React-rendererdebug', 'React-renderertext',
+      'React-renderercomponents', 'React-utils'
+    ]
+    installer.pods_project.targets.each do |t|
+      next unless yoga_consumers.include?(t.name)
+      t.build_configurations.each do |config|
+        config.build_settings['HEADER_SEARCH_PATHS'] ||= ['$(inherited)']
+        config.build_settings['HEADER_SEARCH_PATHS'] << "$(PODS_ROOT)/Headers/Private/Yoga"
+        config.build_settings['HEADER_SEARCH_PATHS'] << "$(PODS_ROOT)/Headers/Public/Yoga"
       end
     end
   end
